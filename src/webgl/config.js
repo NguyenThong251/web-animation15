@@ -88,7 +88,8 @@ export const IMAGES = {
 };
 
 // heading carved under the stele's crown: the 1442 stele's title 大寶三年壬戌科進士題名記 (facts B8);
-// the columns use the builder's defaults (characters from src/data/han-chars.txt only)
+// the columns use the builder's defaults: that heading, then the stele's own passage 賢材國家之元氣…
+// (facts B10), the remaining columns ruled and blank (characters from src/data/han-chars.txt only)
 export const STELE_TEXT = {
   title: "大寶三年壬戌科進士題名記",
 };

@@ -3,6 +3,8 @@
 //    is only kept while something is moving so the open panel can hang below the bar)
 //  * QuickMenu: gradient-ring trigger, rolling section label, clip-path panel (usePanelMotion numbers)
 //  * click → Lenis scrolls 3 s power3.inOut to the anchor; scroll-spy writes app.state.activeNav
+//  * a #nav-anchor-… in the URL (shared link, new tab) is honoured once the intro reveal is over;
+//    'nav:goto' ({ id, immediate, focus }) lets other modules use the same landing positions
 
 const NAV = [
   { id: "nen-mong", label: "Nền móng" },
@@ -257,45 +259,109 @@ export function init(app) {
   measure();
 
   // ------------------------------------------------------------------ navigation
-  function scrollToNav(id) {
+  // where each section "reads" best: most land with the anchor under the header; "Khảo cứu" waits
+  // until its sticky copy has settled (title + paragraph fully on screen); "Tải về" where the
+  // download pill is fully open
+  function landingFor(id, target) {
+    const top = target.getBoundingClientRect().top + scrollY;
+    if (id === "tai-ve") return top + Math.max(0, target.offsetHeight - innerHeight) * DOWNLOAD_LANDING;
+    if (id === "khao-cuu") {
+      const stage = target.querySelector("[data-motion-stage]");
+      const copy = target.querySelector("[data-motion-copy]");
+      if (stage && copy) {
+        const stageTop = stage.getBoundingClientRect().top + scrollY;
+        const lead = parseFloat(getComputedStyle(stage).paddingTop) || 0;
+        const stickyTop = parseFloat(getComputedStyle(copy).top) || 0;
+        return Math.max(0, stageTop + lead - stickyTop);
+      }
+    }
+    return Math.max(0, top - headerHeight());
+  }
+
+  function scrollToNav(id, { immediate = false, focus = true } = {}) {
     const target = document.getElementById(ANCHOR_PREFIX + id);
     if (!target) return;
-    const top = target.getBoundingClientRect().top + scrollY;
-    const y =
-      id === "tai-ve"
-        ? top + Math.max(0, target.offsetHeight - innerHeight) * DOWNLOAD_LANDING
-        : Math.max(0, top - headerHeight());
+    const lenis = app.lenis;
+    lenis?.resize();
+    const y = landingFor(id, target);
 
     spyLockedUntil = performance.now() + SPY_LOCK_MS;
     setActive(id);
 
-    const lenis = app.lenis;
+    const done = () => {
+      spyLockedUntil = 0;
+      spy();
+    };
     if (lenis) {
-      lenis.resize();
       lenis.scrollTo(y, {
         force: true,
+        immediate,
         duration: 3,
         easing: gsap.parseEase("power3.inOut"),
-        onComplete: () => {
-          spyLockedUntil = 0;
-          spy();
-        },
+        onComplete: done,
       });
     } else {
       window.scrollTo(0, y);
+      done();
     }
 
     // move the reading position for assistive tech without a native jump
-    if (!target.hasAttribute("tabindex")) target.setAttribute("tabindex", "-1");
-    target.focus({ preventScroll: true });
+    if (focus) {
+      if (!target.hasAttribute("tabindex")) target.setAttribute("tabindex", "-1");
+      target.focus({ preventScroll: true });
+    }
   }
 
   links.forEach((a) =>
     a.addEventListener("click", (e) => {
+      // Ctrl/Cmd/Shift/Alt-click or another button: let the browser open the link (new tab / window);
+      // only keep Lenis' own anchor handler from scrolling this page as well
+      if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) {
+        e.stopPropagation();
+        return;
+      }
       e.preventDefault();
       e.stopPropagation(); // keep Lenis' own anchor handler from re-targeting the scroll
       closePanel();
       scrollToNav(a.dataset.qmItem);
     }),
   );
+
+  app.on("nav:goto", (p) => p?.id && scrollToNav(p.id, p));
+
+  // ------------------------------------------------------------------ #nav-anchor-… in the URL
+  const navFromHash = () => {
+    let h = "";
+    try {
+      h = decodeURIComponent(location.hash.slice(1));
+    } catch {
+      return null;
+    }
+    if (!h.startsWith(ANCHOR_PREFIX)) return null;
+    const id = h.slice(ANCHOR_PREFIX.length);
+    return indexOf(id) >= 0 ? id : null;
+  };
+  let hashHandled = false;
+  const jumpToHash = () => {
+    if (hashHandled) return;
+    hashHandled = true;
+    const id = navFromHash();
+    if (!id) return;
+    // the page is unlocked now; let late layout (fonts, section pins) settle before measuring
+    document.fonts.ready.then(() =>
+      requestAnimationFrame(() =>
+        requestAnimationFrame(() => {
+          ScrollTrigger.refresh();
+          scrollToNav(id, { immediate: true });
+        }),
+      ),
+    );
+  };
+  if (app.state.revealed) jumpToHash();
+  else app.once("reveal:done", jumpToHash);
+  // a hash typed into the address bar (or back/forward between hashes) while the page is open
+  addEventListener("hashchange", () => {
+    const id = navFromHash();
+    if (id && app.state.revealed) scrollToNav(id);
+  });
 }

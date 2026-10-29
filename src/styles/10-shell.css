@@ -156,7 +156,7 @@
   display: grid;
   place-items: center;
   pointer-events: none;
-  background: var(--color-secondary);
+  background: var(--color-secondary-deep);
   color: var(--color-primary);
   border: 7px solid var(--color-primary);
   padding: var(--margin);
@@ -507,17 +507,70 @@
   height: 200svh;
 }
 
+/* No WebGL picture (unsupported, failed, or the context was lost and the canvas is blank): the copy
+   then sits on the body colour, so use a deeper chàm — white 6.0:1, hồng sen 3.2:1 (vs 4.1 / 2.2 on
+   #5b74eb). html.webgl-lost is set by core/loader.js while the WebGL picture is gone (context lost,
+   or the engine tore its canvas down to rebuild) and cleared once a scene is compiled again. */
+:root {
+  --color-secondary-deep: #4257cf;
+}
+html.webgl-failed body,
+html.webgl-lost body {
+  background: var(--color-secondary-deep);
+}
+
 /* ---------- stele paragraphs (white text over the 3D stele) ---------- */
 .paragraph {
   position: relative;
   z-index: var(--z-section);
+  overflow-x: clip; /* the halo bleeds past the container edges */
 }
 .paragraph__col {
   grid-column: span 2;
 }
 .paragraph__stack {
+  --halo-feather: 3.5rem;
+  position: relative;
   display: grid;
   row-gap: var(--sp-lg);
+}
+/* Soft chàm halo behind the copy column: it dims the halftone scene behind the text (the dots stay
+   visible, just darker) so the white copy (≥ 4.5:1) and the pink eyebrow stay legible where they
+   cross the pink stele, turtle and "1484". The mask ramp is eased, so the edge reads as a glow. */
+.paragraph__stack::before {
+  --f: var(--halo-feather);
+  --halo-ramp: transparent, rgb(0 0 0 / 0.2) calc(var(--f) * 0.3), rgb(0 0 0 / 0.55) calc(var(--f) * 0.55),
+    rgb(0 0 0 / 0.85) calc(var(--f) * 0.8), #000 var(--f), #000 calc(100% - var(--f)),
+    rgb(0 0 0 / 0.85) calc(100% - var(--f) * 0.8), rgb(0 0 0 / 0.55) calc(100% - var(--f) * 0.55),
+    rgb(0 0 0 / 0.2) calc(100% - var(--f) * 0.3), transparent;
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: calc(-1 * (var(--f) + 0.5rem)) calc(-1 * var(--margin));
+  pointer-events: none;
+  background: rgb(30 40 128 / 0.6);
+  -webkit-mask-image: linear-gradient(to bottom, var(--halo-ramp));
+  mask-image: linear-gradient(to bottom, var(--halo-ramp));
+}
+@supports (backdrop-filter: brightness(0.5)) or (-webkit-backdrop-filter: brightness(0.5)) {
+  /* phones: the eyebrow is 20 px (not "large" text) so pink needs 4.5:1 → a deeper dim */
+  .paragraph__stack::before {
+    background: rgb(36 50 168 / 0.1);
+    -webkit-backdrop-filter: brightness(0.4);
+    backdrop-filter: brightness(0.4);
+  }
+  @media (min-width: 768px) {
+    .paragraph__stack::before {
+      -webkit-backdrop-filter: brightness(0.56);
+      backdrop-filter: brightness(0.56);
+    }
+  }
+  /* over the flat deep chàm (no WebGL picture) a light dim is enough: pink eyebrow ≈ 4.8:1 */
+  .webgl-failed .paragraph__stack::before,
+  .webgl-lost .paragraph__stack::before {
+    -webkit-backdrop-filter: brightness(0.75);
+    backdrop-filter: brightness(0.75);
+  }
 }
 .paragraph__eyebrow {
   color: var(--color-primary);
@@ -525,6 +578,12 @@
 .paragraph__heading,
 .paragraph__body {
   color: var(--text-heading-invert);
+}
+/* the stacked-mark examples (ẫ ỗ ẳ) in roman and a touch larger, so both marks read */
+.paragraph__glyph {
+  font-style: normal;
+  font-size: 1.2em;
+  line-height: 0;
 }
 @media (min-width: 768px) {
   .paragraph__col {
@@ -534,10 +593,21 @@
     grid-column: 3 / span 4;
   }
   .paragraph__stack {
+    --halo-feather: 5.5rem;
     row-gap: var(--sp-2xl);
+  }
+  .paragraph__stack::before {
+    inset: calc(-1 * (var(--f) + 0.5rem));
+    -webkit-mask-image: linear-gradient(to right, var(--halo-ramp)), linear-gradient(to bottom, var(--halo-ramp));
+    -webkit-mask-composite: source-in;
+    mask-image: linear-gradient(to right, var(--halo-ramp)), linear-gradient(to bottom, var(--halo-ramp));
+    mask-composite: intersect;
   }
 }
 @media (min-width: 1024px) {
+  .paragraph__stack {
+    --halo-feather: 6.5rem;
+  }
   .paragraph__col {
     grid-column: span 7;
   }
@@ -591,7 +661,9 @@
   color: var(--text-primary);
 }
 .webgl-failed .sticky-text__title,
-.webgl-failed .sticky-text__text {
+.webgl-failed .sticky-text__text,
+.webgl-lost .sticky-text__title,
+.webgl-lost .sticky-text__text {
   color: var(--text-heading-invert);
 }
 .sticky-text__tiles {
@@ -730,9 +802,6 @@
   overflow: clip;
   will-change: width, left, transform;
 }
-.download.is-folded .download__clip {
-  visibility: hidden;
-}
 .download.is-active .download__frame {
   pointer-events: auto;
 }
@@ -756,9 +825,6 @@
   border-radius: 12px;
   color: var(--text-heading-invert);
   box-shadow: 0 0 0 6px rgb(255 255 255 / 0.5);
-}
-.download__btn[aria-disabled="true"] {
-  cursor: default;
 }
 .download__btn:focus-visible {
   outline: 2px solid var(--color-white);
@@ -857,7 +923,9 @@
 }
 .site-footer__link {
   display: flex;
-  margin: calc(-1 * var(--sp-3xs));
+  min-height: 1.5rem;
+  align-items: center;
+  margin-inline: calc(-1 * var(--sp-3xs));
   padding: var(--sp-3xs);
   color: var(--text-primary-invert);
   text-align: left;
@@ -871,6 +939,11 @@
   outline: none;
   border-radius: var(--radius-minimal);
   box-shadow: 0 0 0 0.1875rem color-mix(in srgb, var(--color-primary) 70%, transparent);
+}
+@media (max-width: 767px), (pointer: coarse) {
+  .site-footer__link {
+    min-height: 2.75rem;
+  }
 }
 .site-footer__copy {
   color: var(--text-primary-invert);
@@ -1094,6 +1167,7 @@
 }
 .credits__item:not(:has(.credits__thumb)) {
   grid-template-columns: minmax(0, 1fr);
+  row-gap: var(--sp-3xs);
 }
 .credits__thumb {
   width: 3.5rem;
@@ -1123,6 +1197,9 @@
 }
 .credits__links a:hover {
   color: var(--text-heading);
+}
+.credits__notices {
+  margin-top: var(--sp-xs);
 }
 @media (prefers-reduced-motion: reduce) {
   .credits.is-open {

@@ -6,7 +6,7 @@
 import * as THREE from "three";
 import { FULLSCREEN_VERT, MATH, HALFTONE, STAR } from "./glsl.js";
 import { HALFTONE as HT, PALETTE } from "./config.js";
-import { createSolidTexture, createDepthPlaceholder } from "./textures.js";
+import { createSolidTexture, createDepthPlaceholder, DOT_PATTERN } from "./textures.js";
 
 const FRAG = /* glsl */ `
 uniform sampler2D uScene1;
@@ -65,7 +65,7 @@ float halftone(vec3 src, vec2 frag) {
   return kvHalftone(src, frag, uRes, uDotCount, uDotRotation, uDotMaxRadius, uDotBrightness, uDotContrast);
 }
 
-// paper: a 6×6 two-dot tile repeated uPatternDensity times per screen height
+// paper: the micro-dot tile (textures.js DOT_PATTERN) repeated uPatternDensity times per screen height
 vec3 paper(vec3 a, vec3 b, vec2 frag) {
   float ink = 1.0 - texture2D(uDotPattern, frag / uRes.yy * uPatternDensity).r;
   return mix(a, b, ink * uPatternOpacity);
@@ -244,7 +244,7 @@ export class Compositor {
       uDotMaxRadius: { value: HT.maxRadius },
       uDotBrightness: { value: HT.brightness },
       uDotContrast: { value: HT.contrast },
-      uPatternDensity: { value: 120 },
+      uPatternDensity: { value: DOT_PATTERN.repeat },
       uPatternOpacity: { value: 1 },
       uPrimary: { value: color(PALETTE.primary) },
       uSecondary: { value: color(PALETTE.secondary) },

@@ -22,20 +22,34 @@ const GROUP_ORDER = [
   "Mũi tên & toán",
 ];
 
-// Hán characters carved on the Văn Miếu steles and in the names around them, with their Hán-Việt reading.
+// Hán characters from three places in our story, with their Hán-Việt reading and where they come from:
+// the names of Văn Miếu – Quốc Tử Giám and Khuê Văn Các (文廟 · 國子監 · 奎文閣), the doctoral steles
+// (the inscription titles end in 進士題名記 "tiến sĩ đề danh ký", 碑 = "bia", and the 1442 stele's
+// 賢材國家之元氣), and Truyện Kiều (金雲翹 Kim Vân Kiều; its original title 斷腸新聲 Đoạn trường tân thanh).
+const HAN_SOURCES = [
+  ["文", "Văn Miếu, Khuê Văn Các"],
+  ["廟", "Văn Miếu"],
+  ["國子監", "Quốc Tử Giám"],
+  ["奎閣", "Khuê Văn Các"],
+  ["進士題名記", "nhan đề văn bia tiến sĩ"],
+  ["碑", "nghĩa là “bia”"],
+  ["賢材元氣", "“Hiền tài… nguyên khí”, bia 1442"],
+  ["金雲翹", "Kim Vân Kiều"],
+  ["斷腸新聲", "Đoạn trường tân thanh"],
+];
 const HAN_READINGS = {
-  文: "văn", 廟: "miếu", 國: "quốc", 子: "tử", 監: "giám", 奎: "khuê", 閣: "các", 進: "tiến",
-  士: "sĩ", 題: "đề", 名: "danh", 碑: "bi", 記: "ký", 賢: "hiền", 元: "nguyên", 氣: "khí",
-  字: "tự", 漢: "hán", 喃: "nam", 越: "việt", 南: "nam", 金: "kim", 雲: "vân", 翹: "kiều",
+  文: "văn", 廟: "miếu", 國: "quốc", 子: "tử", 監: "giám", 奎: "khuê", 閣: "các",
+  進: "tiến", 士: "sĩ", 題: "đề", 名: "danh", 記: "ký", 碑: "bi", 賢: "hiền", 材: "tài", 元: "nguyên", 氣: "khí",
+  金: "kim", 雲: "vân", 翹: "kiều", 斷: "đoạn", 腸: "trường", 新: "tân", 聲: "thanh",
 };
-const HAN_NOTES = { 字: "; nghĩa là “chữ”", 喃: "; trong “chữ Nôm” đọc là “nôm”" };
+const HAN_NOTES = Object.fromEntries(HAN_SOURCES.flatMap(([chars, note]) => [...chars].map((ch) => [ch, ` · ${note}`])));
 
 const GROUPS = [
   ...GROUP_ORDER.map((name) => {
     const cat = glyphData.categories.find((c) => c.name === name);
     return { name, han: false, glyphs: cat ? cat.glyphs : [] };
   }),
-  { name: "Chữ Hán trên bia", han: true, glyphs: Object.keys(HAN_READINGS) },
+  { name: "Chữ Hán: Văn Miếu, văn bia, Truyện Kiều", han: true, glyphs: Object.keys(HAN_READINGS) },
 ];
 
 // EB Garamond Italic (variable) has no superior figures ¹ ² ³ — like the reference, each style

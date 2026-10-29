@@ -4,7 +4,7 @@
      vertical deck that rotates one poster every 160svh). <768: swipe carousel.
      Motion: src/sections/poster-deck.js · styles: src/styles/30-poster-deck.css
      ========================================================================== -->
-<section class="deck" data-deck aria-label="Bộ sưu tập áp phích">
+<section class="deck" data-deck aria-label="Bộ sưu tập áp phích minh hoạ kiểu chữ — ấn phẩm và sản phẩm là giả định">
   <div class="deck__stage" data-deck-stage>
     <!-- giant white words, split outward from the centre seam (desktop only) -->
     <div class="deck__words" data-deck-words role="img" aria-label="Khuê Văn">
@@ -19,14 +19,15 @@
         <!-- 1 · city magazine cover -->
         <div class="deck__card" data-deck-card style="--order: 0; --sequence-base-x: 0%; --intro-base: 0vh; --intro-root: 10vh; --intro-slice: 3vh; --intro-scale: 1.5">
           <div class="deck__lift">
-            <div class="pd-poster pd-hanoi" role="img" aria-label="Áp phích 1: bìa tạp chí “Hà Nội”, số 01, thu 2026, chuyên đề “Nghìn năm văn hiến”, ảnh Khuê Văn Các in hai màu chàm và hồng.">
+            <div class="pd-poster pd-hanoi" role="img" aria-label="Áp phích 1: bìa tạp chí giả định “Hà Nội”, ghi “Ấn phẩm minh hoạ”, số 01, thu 2026, chuyên đề Văn Miếu – Quốc Tử Giám “Nghìn năm văn hiến”, ảnh Khuê Văn Các in hai màu chàm và hồng.">
               <div class="pd-hanoi__photo">
-                <img src="images/khue-van-cac-wide.webp" alt="" width="1800" height="1200" decoding="async" draggable="false" />
+                <!-- 4:5 crop of khue-van-cac-wide.webp sized for the poster; lazy + low priority, poster-deck.js primes it near the deck -->
+                <img src="images/posters/khue-van-cac-poster.webp" alt="" width="960" height="1200" loading="lazy" fetchpriority="low" decoding="async" draggable="false" data-deck-img />
               </div>
               <div class="pd-hanoi__shade"></div>
               <div class="pd-hanoi__top">
                 <span>Số 01 · Thu 2026</span>
-                <span>Tạp chí thành phố</span>
+                <span>Ấn phẩm minh hoạ</span>
               </div>
               <p class="pd-hanoi__mast">Hà Nội</p>
               <div class="pd-hanoi__rubric">
@@ -60,7 +61,8 @@
               <p class="pd-kieu__title"><span class="pd-kieu__title-small">Truyện</span><span class="pd-kieu__title-big">Kiều</span></p>
               <div class="pd-kieu__plate">
                 <div class="pd-kieu__print">
-                  <img src="images/kim-van-kieu-tan-truyen.webp" alt="" width="1000" height="764" decoding="async" draggable="false" />
+                  <!-- same file as the Khảo cứu tile above (already cached when the deck is reached by scrolling) -->
+                  <img src="images/kim-van-kieu-tan-truyen.webp" alt="" width="1000" height="764" loading="lazy" fetchpriority="low" decoding="async" draggable="false" data-deck-img />
                 </div>
                 <span class="pd-kieu__seal han" aria-hidden="true"><span>新</span><span>斷</span><span>聲</span><span>腸</span></span>
               </div>
@@ -77,7 +79,7 @@
         <!-- 3 · lotus-tea poster -->
         <div class="deck__card" data-deck-card style="--order: 2; --sequence-base-x: 50%; --intro-base: 40vh; --intro-root: 40vh; --intro-slice: 8vh; --intro-scale: 0.8">
           <div class="deck__lift">
-            <div class="pd-poster pd-sen" role="img" aria-label="Áp phích 3: trà ướp hương sen “Hương Sen — N°.07”, khung hoa văn mảnh trên nền hồng phấn, hình hoa sen vẽ nét, dòng chữ “Một mùi hương, trước khi thành ký ức.”">
+            <div class="pd-poster pd-sen" role="img" aria-label="Áp phích 3: bao bì minh hoạ cho một loại trà ướp hương sen giả định “Hương Sen — N°.07”, khung hoa văn mảnh trên nền hồng phấn, hình hoa sen vẽ nét, dòng chữ “Một mùi hương, trước khi thành ký ức.”">
               <svg class="pd-sen__frame" viewBox="0 0 400 500" aria-hidden="true" focusable="false">
                 <!-- outer hairline with concave (notched) corners, centred on the corner points -->
                 <path class="pd-sen__line" d="M28 14H372A14 14 0 0 0 386 28V472A14 14 0 0 0 372 486H28A14 14 0 0 0 14 472V28A14 14 0 0 0 28 14Z" />
@@ -138,7 +140,7 @@
                 <ellipse cx="100" cy="119" rx="10" ry="3.4" class="pd-sen__calyx" />
               </svg>
               <p class="pd-sen__line-copy">Một mùi hương, trước khi thành ký ức.</p>
-              <p class="pd-sen__small">Hái lúc tinh sương<i></i>Ướp qua một đêm<i></i>100 g</p>
+              <p class="pd-sen__small">Hái lúc tinh sương<i></i>Ướp qua một đêm<i></i>Mẫu minh hoạ</p>
             </div>
           </div>
         </div>
@@ -171,6 +173,9 @@
       <span class="deck__dot"></span><span class="deck__dot"></span><span class="deck__dot"></span><span class="deck__dot"></span>
     </div>
     <p class="sr-only" data-deck-status aria-live="polite"></p>
+
+    <!-- disclosure: the magazine and the tea are invented for the type specimen -->
+    <p class="deck__note t-small" data-deck-note>Áp phích minh hoạ kiểu chữ — ấn phẩm và sản phẩm là giả định.</p>
   </div>
 
   <!-- scroll length for the desktop deck: intro (100svh) · sequence (100svh) · carousel (800svh) -->

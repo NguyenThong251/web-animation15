@@ -24,40 +24,19 @@ const HAN_FAMILY = "Noto Serif TC Han";
 
 export const DEFAULT_TITLE = "大寶三年壬戌科進士題名記";
 
-// Phrases built only from characters present in src/data/han-chars.txt (the font subset).
-const PHRASES = [
-  "賢才者國家之元氣",
-  "黎聖宗洪德十五年",
-  "文廟國子監",
-  "奎文閣",
-  "天光井",
-  "至聖先師孔子",
-  "周公",
-  "道德文章",
-  "詩書",
-  "筆墨紙硯",
-  "龍麟龜鳳",
-  "進士題名",
-  "大成門",
-];
+// The famous passage of the same 1442 stele (text by Thân Nhân Trung, erected 1484), as transcribed
+// on vi.wikisource (賢材, not the popular 賢才者): "Hiền tài quốc gia chi nguyên khí, nguyên khí thịnh
+// tắc quốc thế cường dĩ long, nguyên khí nỗi tắc quốc thế nhược dĩ ô" — one clause per column.
+// Every character is in src/data/han-chars.txt (the Noto Serif TC Han subset).
+export const DEFAULT_PASSAGE = ["賢材國家之元氣", "元氣盛則國勢強以隆", "元氣餒則國勢弱以污"];
 
-/** Default columns: the title column, then the phrases flowed into full-height columns. */
-export function defaultSteleLines(columns = 15, perColumn = 20) {
-  const out = [DEFAULT_TITLE];
-  let col = "";
-  let i = 0;
-  while (out.length < columns - 1) {
-    const phrase = PHRASES[i % PHRASES.length];
-    i++;
-    for (const ch of phrase) {
-      col += ch;
-      if (col.length === perColumn) out.push(col), (col = "");
-      if (out.length >= columns - 1) break;
-    }
-    if (col.length && col.length < perColumn) col += "　"; // blank cell between phrases
-    if (col.length >= perColumn) out.push(col.slice(0, perColumn)), (col = "");
-  }
-  out.push("洪德十五年" + "　" + "申仁忠記"); // date + author column, as stele texts close
+/**
+ * Default columns, read right → left: the heading, then the passage. Only authentic text is carved;
+ * the rest of the field stays as empty ruled columns rather than invented filler.
+ */
+export function defaultSteleLines(columns = 15, title = DEFAULT_TITLE) {
+  const out = [title, ...DEFAULT_PASSAGE];
+  while (out.length < columns) out.push("");
   return out;
 }
 
@@ -222,6 +201,17 @@ function drawSteleCarving(canvas, PPM, stripPx, { lines, title, seed = 1442 }) {
   ctx.strokeRect(X(fx0), Y(fy1), (fx1 - fx0) * PPM, (fy1 - fy0) * PPM);
   const cols = lines.length;
   const colPitch = Math.min(0.06, (fx1 - fx0 - 0.02) / Math.max(cols, 1));
+  // ruled columns: a faint incised line between every column, carved or left blank
+  ctx.strokeStyle = grey(LEVEL.line + 30);
+  ctx.lineWidth = 0.002 * PPM;
+  ctx.beginPath();
+  for (let c = 0; c <= cols; c++) {
+    const x = fx1 - 0.012 - colPitch * c;
+    if (x <= fx0 + 0.004) break;
+    ctx.moveTo(X(x), Y(fy1 - 0.008));
+    ctx.lineTo(X(x), Y(fy0 + 0.008));
+  }
+  ctx.stroke();
   const maxLen = Math.max(...lines.map((l) => [...l].length), 1);
   const charPitch = Math.min(colPitch * 1.02, (fy1 - fy0 - 0.03) / maxLen);
   const size = Math.min(colPitch, charPitch) * 0.84;
@@ -560,7 +550,7 @@ export async function buildSteleOnTurtle(THREE, { lines, title, quality = "high"
   await loadHanFont();
   const hi = quality !== "low";
   title = title || DEFAULT_TITLE;
-  lines = Array.isArray(lines) && lines.length ? lines.map(String) : defaultSteleLines();
+  lines = Array.isArray(lines) && lines.length ? lines.map(String) : defaultSteleLines(15, title);
 
   const group = new THREE.Group();
   group.name = "stele-on-turtle";

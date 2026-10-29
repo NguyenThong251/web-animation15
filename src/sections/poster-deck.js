@@ -36,6 +36,7 @@ export function init(app) {
   if (!els.stage || els.cards.length < 2) return;
 
   watchDocumentHeight(app);
+  primePosterImages(app, section);
 
   const mm = app.gsap.matchMedia();
   mm.add(
@@ -65,6 +66,49 @@ function watchDocumentHeight(app) {
     timer = setTimeout(() => app.ScrollTrigger.refresh(), 200);
   });
   ro.observe(document.body);
+}
+
+// The poster photos are loading="lazy" + fetchpriority="low" so they never compete with the
+// WebGL assets at startup (the deck sits ~15,000 px down). Two triggers switch them to eager
+// and pre-decode them, so jumping straight into the deck shows no empty poster:
+//  · the section comes within two viewports (IntersectionObserver rootMargin), and
+//  · a cache warm-up once the intro reveal is over and the main thread is idle
+//    (skipped when the visitor asked to save data or is on a 2G-class connection).
+function primePosterImages(app, section) {
+  const imgs = [...section.querySelectorAll("img[data-deck-img]")];
+  if (!imgs.length) return;
+  let primed = false;
+  let io = null;
+  let offReveal = null;
+
+  const prime = (urgent) => {
+    if (primed) return;
+    primed = true;
+    io?.disconnect();
+    offReveal?.();
+    imgs.forEach((img) => {
+      if (urgent) img.fetchPriority = "high";
+      img.loading = "eager"; // starts the request now if the lazy loader has not yet
+      img.decode?.().catch(() => {}); // decode off the critical paint; ignore broken/aborted images
+    });
+  };
+
+  if ("IntersectionObserver" in window) {
+    io = new IntersectionObserver((entries) => entries.some((e) => e.isIntersecting) && prime(true), {
+      rootMargin: "200% 0px",
+    });
+    io.observe(section);
+  } else {
+    prime(true);
+    return;
+  }
+
+  const conn = navigator.connection;
+  if (conn?.saveData || /(^|-)2g$/.test(conn?.effectiveType || "")) return;
+  const idle = window.requestIdleCallback ?? ((fn) => setTimeout(fn, 1));
+  const warm = () => setTimeout(() => idle(() => prime(false), { timeout: 4000 }), 3000);
+  if (app.state.revealed) warm();
+  else offReveal = app.once("reveal:done", warm);
 }
 
 /* ------------------------------------------------------------------------ */

@@ -6,6 +6,9 @@
 //         scene per frame → 'webgl:compiled'.
 // Reveal: 'reveal:start' → 4 s ink-blot + depth materialisation + hero crane-in → 'reveal:done'.
 // Frame:  scroll → scene table → update the 1–2 active scenes → render their passes → composite.
+// Context loss: the engine stops issuing GL calls the moment the context is lost (event or
+//         isContextLost()) and hands itself to `onContextLost`; index.js tears it down and boots a
+//         fresh engine on a new canvas once the GPU is back (see index.js).
 import * as THREE from "three";
 import { SceneScrollMap } from "./scroll-map.js";
 import { Compositor } from "./compositor.js";
@@ -22,11 +25,15 @@ import { InscriptionScene } from "./scenes/inscription.js";
 const nextFrame = () => new Promise((r) => requestAnimationFrame(() => r()));
 
 export class Engine {
-  constructor(app, container, models) {
+  constructor(app, container, models, { onContextLost = null } = {}) {
     this.app = app;
     this.container = container;
     this.models = models;
+    this.onContextLost = onContextLost;
+    // a rebuild after a context loss: the loader is gone and the page may already be revealed
+    this.recovering = !!app.state.compiled;
     this.disposed = false;
+    this.contextLost = false;
     this.compiled = false;
     this.revealState = "idle"; // idle → pending → running → done
     this.time = 0;
@@ -57,7 +64,9 @@ export class Engine {
       powerPreference: "high-performance",
     });
     if (!gl) throw new Error("WebGL2 is not available");
+    this.gl = gl;
     const renderer = new THREE.WebGLRenderer({ canvas, context: gl, antialias: false, alpha: true });
+    renderer.debug.onShaderError = (glc, program, vs, fs) => this.onShaderError(glc, program, vs, fs);
     renderer.toneMapping = THREE.NoToneMapping;
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.shadowMap.enabled = true;
@@ -70,20 +79,54 @@ export class Engine {
       renderer.extensions.has("EXT_color_buffer_float") || renderer.extensions.has("EXT_color_buffer_half_float");
     this.container.appendChild(canvas);
 
+    // preventDefault keeps the browser willing to restore; the rebuild itself happens in index.js
     const onLost = (e) => {
       e.preventDefault();
-      this.stopLoop();
-    };
-    const onRestored = () => {
-      this.splat?.resize(this.width, this.height, this.dpr);
-      if (document.visibilityState === "visible") this.startLoop();
+      this.handleContextLost();
     };
     canvas.addEventListener("webglcontextlost", onLost);
-    canvas.addEventListener("webglcontextrestored", onRestored);
-    this.cleanups.push(() => {
-      canvas.removeEventListener("webglcontextlost", onLost);
-      canvas.removeEventListener("webglcontextrestored", onRestored);
-    });
+    this.cleanups.push(() => canvas.removeEventListener("webglcontextlost", onLost));
+  }
+
+  // true once the context is gone — also before 'webglcontextlost' is dispatched (the GPU process
+  // can die mid-frame); every GL entry point checks this so nothing is compiled or drawn while lost
+  checkLost() {
+    if (this.contextLost) return true;
+    if (!this.gl?.isContextLost()) return false;
+    this.handleContextLost();
+    return true;
+  }
+
+  handleContextLost() {
+    if (this.contextLost || this.disposed) return;
+    this.contextLost = true;
+    this.stopLoop();
+    clearTimeout(this.shaderErrorTimer);
+    this.onContextLost?.(this);
+  }
+
+  // three reports a failed program link here instead of logging it. When the GPU process goes away
+  // mid-link the link "fails" a moment before the context is reported lost, so hold rendering for a
+  // beat and report only failures that are not followed by a context loss.
+  onShaderError(gl, program, vs, fs) {
+    const info = {
+      shader: this.renderer?.info.programs?.find((p) => p.program === program)?.name ?? "",
+      program: gl.getProgramInfoLog(program)?.trim() || "",
+      vertex: gl.getShaderInfoLog(vs)?.trim() || "",
+      fragment: gl.getShaderInfoLog(fs)?.trim() || "",
+    };
+    this.shaderErrorHold = true;
+    clearTimeout(this.shaderErrorTimer);
+    this.shaderErrorTimer = setTimeout(() => {
+      this.shaderErrorHold = false;
+      if (this.disposed || this.checkLost()) return;
+      console.error("[webgl] shader program failed to link", info);
+    }, 600);
+  }
+
+  // the boot sequence stops as soon as the engine is disposed or its context is lost
+  get alive() {
+    return !this.disposed && !this.checkLost();
   }
 
   async start() {
@@ -111,7 +154,10 @@ export class Engine {
     };
 
     this.resize();
+    if (!this.alive) return;
     this.bindEvents();
+    // rebuilt after a context loss on an already revealed page: no ink-blot intro again
+    if (app.state.revealed) this.skipReveal();
     // the loader background (blue paper, pink micro-dots) renders while the scenes load
     this.startLoop();
 
@@ -129,25 +175,27 @@ export class Engine {
         this.setProgress(0.99 * (loaded / ids.length));
       }),
     );
-    if (this.disposed) return;
+    if (!this.alive) return;
     this.resize(true);
 
     // ---- compile every scene (+ compositor and splat) before anything is shown
     for (const id of ids) {
       await this.compileScene(this.scenes[id]);
-      if (this.disposed) return;
+      if (!this.alive) return;
     }
     this.renderer.compile(this.compositor.scene, this.compositor.camera);
     this.renderer.compile(this.splat.scene, this.splat.camera);
+    await this.waitForPrograms();
+    if (!this.alive) return;
 
     // ---- warm-up: one real render of each scene, one per frame (shadow programs, texture uploads)
     for (const id of ids) {
       await nextFrame();
-      if (this.disposed) return;
+      if (!this.alive) return;
       this.renderPasses(this.scenes[id], 0);
     }
     await nextFrame();
-    if (this.disposed) return;
+    if (!this.alive) return;
 
     this.compiled = true;
     this.compositor.uniforms.uCompiled.value = 1;
@@ -158,6 +206,7 @@ export class Engine {
   }
 
   setProgress(p) {
+    if (this.recovering) return; // the loader is long gone
     this.app.state.webglProgress = p;
     this.app.emit("webgl:progress", p);
   }
@@ -171,13 +220,7 @@ export class Engine {
     });
     s.camera.layers.enableAll();
     try {
-      // compileAsync only pays off (and only stays quiet) with KHR_parallel_shader_compile
-      const r = this.renderer;
-      if (r.extensions.has("KHR_parallel_shader_compile")) await r.compileAsync(s.scene, s.camera);
-      else {
-        r.compile(s.scene, s.camera);
-        await nextFrame(); // keep the loader animating between scenes
-      }
+      this.renderer.compile(s.scene, s.camera);
     } finally {
       s.camera.layers.set(0);
       for (const [o, v, f] of restore) {
@@ -185,6 +228,21 @@ export class Engine {
         o.frustumCulled = f;
       }
     }
+    await this.waitForPrograms();
+  }
+
+  // Wait until every linked program reports ready. With KHR_parallel_shader_compile the driver links
+  // in the background and isReady() polls COMPLETION_STATUS without blocking; without it every
+  // program is ready at once. Unlike renderer.compileAsync(), this poll stops when the engine is
+  // disposed or the context is lost (a lost context never reports "ready" and must not be polled).
+  async waitForPrograms(timeoutMs = 20000) {
+    const t0 = performance.now();
+    do {
+      await nextFrame(); // keeps the loader animating between scenes
+      if (!this.alive) return;
+      const programs = this.renderer.info.programs ?? [];
+      if (programs.every((p) => p.isReady())) return;
+    } while (performance.now() - t0 < timeoutMs);
   }
 
   /* ------------------------------------------------------------------ events */
@@ -256,6 +314,7 @@ export class Engine {
   }
 
   resize(force = false) {
+    if (this.disposed || this.checkLost()) return;
     const w = Math.max(1, this.container.clientWidth || innerWidth);
     const h = Math.max(1, this.container.clientHeight || innerHeight);
     const dpr = clamp(window.devicePixelRatio || 1, DPR_RANGE[0], DPR_RANGE[1]);
@@ -322,6 +381,16 @@ export class Engine {
       .fromTo(hero.crane, { y: this.reducedMotion ? 0 : -3 }, { y: 0, duration: 4 * k, ease: "power3.inOut" }, 0);
   }
 
+  // final reveal state without the animation (engine rebuilt after a context loss)
+  skipReveal() {
+    this.revealState = "done";
+    const u = this.compositor.uniforms;
+    u.uRevealProgress.value = 1;
+    u.uRevealDepthProgress.value = 1;
+    u.uRevealActive.value = 0;
+    this.scenes.hero.crane.y = 0;
+  }
+
   finishReveal() {
     this.revealState = "done";
     const u = this.compositor.uniforms;
@@ -337,7 +406,7 @@ export class Engine {
   /* ------------------------------------------------------------------ frame */
 
   startLoop() {
-    if (this.running || this.disposed) return;
+    if (this.running || this.disposed || this.contextLost) return;
     this.running = true;
     this.last = performance.now() / 1000;
     this.renderer.setAnimationLoop(() => this.tick());
@@ -370,6 +439,9 @@ export class Engine {
   }
 
   tick() {
+    if (this.checkLost()) return;
+    // a shader just failed to link: wait to see whether the context is going away (onShaderError)
+    if (this.shaderErrorHold) return;
     const now = performance.now() / 1000;
     const delta = Math.max(0, now - this.last);
     this.last = now;
@@ -421,6 +493,7 @@ export class Engine {
     if (this.disposed) return;
     this.disposed = true;
     this.stopLoop();
+    clearTimeout(this.shaderErrorTimer);
     this.revealTl?.kill();
     this.cleanups.forEach((fn) => fn());
     this.cleanups = [];

@@ -2,6 +2,17 @@
      the last one expands into a live type tester. Motion: src/sections/typeface-wheel.js -->
 <section class="tw" id="nav-anchor-kieu-chu" data-nav="kieu-chu" data-typeface-wheel aria-labelledby="tw-title">
   <div class="tw__sticky">
+    <!-- the heading + text come first in the DOM (reading and Tab order: heading → tester); the copy
+         still paints above the cards through its z-index -->
+    <div class="container tw__copy-layer">
+      <div class="grid">
+        <div class="tw__copy" data-tw-copy>
+          <h2 class="t-h4 tw__title" id="tw-title" data-tw-title tabindex="-1">Một kiểu chữ, bốn giọng</h2>
+          <p class="t-body tw__text" data-tw-text-copy>EB Garamond là bản phục dựng mã nguồn mở của dòng chữ Garamond thế kỷ XVI, có đủ bộ dấu tiếng Việt. “EB” là Egenolff – Berner, bản mẫu chữ in năm 1592 mà Georg Duffner dựa vào để vẽ lại chữ của Claude Garamont; phiên bản do Octavio Pardo khởi xướng về sau trở thành phông biến thiên, độ đậm từ 400 đến 800.</p>
+        </div>
+      </div>
+    </div>
+
     <div class="tw__stage" data-tw-stage>
       <figure class="tw__card" data-tw-card="0" data-tone="indigo" style="z-index: 40">
         <canvas class="tw__canvas" data-tw-canvas="marks" aria-hidden="true"></canvas>
@@ -22,7 +33,7 @@
         <canvas class="tw__canvas" data-tw-canvas="tester" aria-hidden="true"></canvas>
         <figcaption class="sr-only">Thử chữ: gõ một dòng tiếng Việt và xem nó trong bốn kiểu của EB Garamond.</figcaption>
 
-        <div class="tw-tester" data-tw-tester inert>
+        <div class="tw-tester" data-tw-tester>
           <div class="tw-tester__head">
             <p class="tw-tester__eyebrow">Thử chữ</p>
             <fieldset class="tw-seg">
@@ -79,15 +90,6 @@
           </div>
         </div>
       </figure>
-    </div>
-
-    <div class="container tw__copy-layer">
-      <div class="grid">
-        <div class="tw__copy" data-tw-copy>
-          <h2 class="t-h4 tw__title" id="tw-title" data-tw-title>Một kiểu chữ, bốn giọng</h2>
-          <p class="t-body tw__text" data-tw-text-copy>EB Garamond là bản phục dựng mã nguồn mở của dòng chữ Garamond thế kỷ XVI, có đủ bộ dấu tiếng Việt. Thường, nghiêng, đậm, đậm nghiêng — đủ cho sách, báo, văn bản và những dòng tiêu đề trang trọng.</p>
-        </div>
-      </div>
     </div>
   </div>
 </section>

@@ -57,6 +57,35 @@ function centreFrames(frames) {
   }
 }
 
+function watchScenePicture(app) {
+  const host = document.getElementById("webgl");
+  if (!host) return;
+  const html = document.documentElement;
+  let hadPicture = !!app.state.compiled;
+  const setLost = (on) => html.classList.toggle("webgl-lost", on && !app.state.webglFailed);
+  const onLost = () => hadPicture && setLost(true);
+  const onRestored = () => setLost(false);
+  const watched = new WeakSet();
+  const scan = () => {
+    const canvases = host.querySelectorAll("canvas");
+    canvases.forEach((c) => {
+      if (watched.has(c)) return;
+      watched.add(c);
+      c.addEventListener("webglcontextlost", onLost);
+      c.addEventListener("webglcontextrestored", onRestored);
+    });
+    if (!canvases.length) onLost(); // the engine tore its canvas down (rebuild in progress)
+  };
+  new MutationObserver(scan).observe(host, { childList: true });
+  scan();
+  // a (re)built engine has its scenes on screen again
+  app.on("webgl:compiled", () => {
+    hadPicture = true;
+    setLost(false);
+  });
+  app.on("webgl:error", () => setLost(false)); // html.webgl-failed takes over
+}
+
 export function init(app) {
   const root = document.querySelector("[data-loader]");
   if (!root || root.dataset.ready) return;
@@ -73,6 +102,11 @@ export function init(app) {
   const status = root.querySelector("[data-loader-status]");
 
   const frames = buildFrames(flip);
+
+  // ---- WebGL picture gone (context lost: the canvas goes blank, or the engine drops it to rebuild on
+  // a new one) → the copy sits on the body colour: flag html.webgl-lost so the shell switches to its
+  // no-WebGL contrast styles (deeper chàm, white sticky text) until a scene is compiled again.
+  watchScenePicture(app);
 
   // ---- border progress path: starts top-centre, clockwise round the viewport ----
   let progress = app.state.webglProgress || 0;

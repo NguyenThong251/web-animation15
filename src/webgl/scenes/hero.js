@@ -14,12 +14,44 @@ import { STYLE, FONTS, remap } from "../config.js";
 // shadow range (15), parallax (±0.8), crane (−3) and depth-reveal window read at the same scale
 const WORLD_SCALE = 0.25;
 
+const FILL_INTENSITY = 3; // candela, no decay: the shadowed upper-room face reads as a light mid tone
+
 const ROLL = [
   { p: 0, v: 0 },
   { p: 0.33, v: -50.314 },
   { p: 0.66, v: 29.3582 },
   { p: 1, v: -1.33592 },
 ];
+
+// Authored flight in scene units, relative to an anchor: K = Khuê Văn Các (ground), G = centre of
+// the Thiên Quang well (ground), SL = the left stele house. [anchor, x, y, z]; x mirrors if the
+// left row moves to +x, everything scales with the pavilion's height (see setFlight).
+// Khuê Văn Các seen from the Đại Trung courtyard; climb past its upper storey to drone height
+// (≈ 3.4 units ≈ 14 m, just over the tallest crowns), cross the Thiên Quang well and bank toward the
+// left stele house, then swing round to look back at the pavilion. From p ≈ 0.1 the targets sit a
+// little ABOVE the camera (pitch +2…+5°): the roofs, crowns and steles stay in the lower part of the
+// frame and the title band ("KHUÊ VĂN", drawn only over the sky) keeps sky behind it on desktop and
+// mobile, sliding behind a roof or a crown now and then like the reference's title.
+const FLIGHT = {
+  pos: [
+    ["K", 0, 1.55, 4.4],
+    ["K", 0.6, 2.6, 2.4],
+    ["K", 1.8, 3.3, -1.0],
+    ["G", 1.0, 3.5, 1.5],
+    ["G", -1.6, 3.4, -1.8],
+    ["G", -1.2, 3.0, -4.6],
+    ["G", 0.3, 2.6, -5.9],
+  ],
+  target: [
+    ["K", 0, 1.95, -2.5],
+    ["K", -0.2, 2.6, -2.5],
+    ["G", -1.0, 3.9, -3.0],
+    ["SL", 0.0, 4.2, -2.5],
+    ["SL", 0.5, 3.9, 4.0],
+    ["K", 0, 3.0, -1.9],
+    ["K", 0, 2.2, 0],
+  ],
+};
 
 const SKY_VERT = /* glsl */ `
 varying vec2 vUv;
@@ -110,36 +142,8 @@ export class HeroScene extends BaseScene {
     const k = H / 2.31;
     const side = SL.x <= P.x ? 1 : -1;
     const G = new THREE.Vector3(P.x, 0, P.z); // the well's centre at ground level
-    const v = (base, x, y, z) => base.clone().add(new THREE.Vector3(x * k * side, y * k, z * k));
-    // +Z = entrance. The flight: Khuê Văn Các seen from the Đại Trung courtyard, rise and bank past
-    // its upper storey, cross the Thiên Quang well toward the left stele house, run along its steles,
-    // then swing round to look back at the pavilion across the well.
-    this.posCurve = new THREE.CatmullRomCurve3(
-      [
-        v(K, 0, 1.55, 4.4),
-        v(K, 0.8, 2.5, 2.7),
-        v(K, 2.5, 2.55, -0.2),
-        v(G, 1.3, 2.1, 0.9),
-        v(G, -2.3, 1.75, -2.3),
-        v(G, -1.3, 2.05, -5.0),
-        v(G, 0.3, 2.2, -5.9),
-      ],
-      false,
-      "centripetal",
-    );
-    this.targetCurve = new THREE.CatmullRomCurve3(
-      [
-        v(K, 0, 1.95, -2.5),
-        v(K, -0.2, 2.35, -2.3),
-        v(G, -1.2, 1.85, -1.5),
-        v(SL, 0.4, 1.35, -1.3),
-        v(SL, 0.3, 1.2, 4.1),
-        v(K, 0, 2.0, -1.9),
-        v(K, 0, 1.95, 0),
-      ],
-      false,
-      "centripetal",
-    );
+    this.bases = { K, G, SL, k, side };
+    this.setFlight(FLIGHT);
     this.H = H;
 
     // key light: point light, shadows, no ambient (SPEC_WEBGL §5.1)
@@ -153,6 +157,19 @@ export class HeroScene extends BaseScene {
     light.shadow.camera.updateProjectionMatrix();
     this.light = light;
     this.scene.add(light);
+
+    // opening-shot fill: the upper storey sits under the skirt roof's eave, in the key light's
+    // shadow, so its round "Khuê star" window read as a dark smudge at p = 0. A weak shadowless spot
+    // from the Đại Trung courtyard, aimed at the window and cut off just behind the pavilion, brings
+    // out the ring and its radiating bars; it fades out while the camera climbs (see update).
+    // Proportions of the pavilion: window centre ≈ 0.53 H up, front face ≈ 0.25 H ahead of K.
+    const win = K.clone().add(new THREE.Vector3(0, 0.53 * H, 0.25 * H));
+    const fill = new THREE.SpotLight(0xffffff, 0, 2.4 * H, 0.2, 0.5, 0);
+    fill.position.copy(win).add(new THREE.Vector3(-0.22 * H * side, 0.25 * H, 1.48 * H));
+    fill.target.position.copy(win);
+    fill.castShadow = false;
+    this.fill = fill;
+    this.scene.add(fill, fill.target);
 
     // sky dome (layer 2 → background pass), centred on the camera so its meridians stay vertical
     this.skyUniforms = {
@@ -199,6 +216,14 @@ export class HeroScene extends BaseScene {
     this.camera.position.set(0, 0, 0);
   }
 
+  // build the position / target CatmullRom curves from anchor-relative waypoints
+  setFlight({ pos, target }) {
+    const { k, side } = this.bases;
+    const v = ([base, x, y, z]) => this.bases[base].clone().add(new THREE.Vector3(x * k * side, y * k, z * k));
+    this.posCurve = new THREE.CatmullRomCurve3(pos.map(v), false, "centripetal");
+    this.targetCurve = new THREE.CatmullRomCurve3(target.map(v), false, "centripetal");
+  }
+
   // camera rig, light and sky for progress p; k = parallax damping factor
   place(p, pointer, k, reducedMotion) {
     const pos = this.posCurve.getPointAt(p, this._pos);
@@ -235,6 +260,8 @@ export class HeroScene extends BaseScene {
 
   update({ dt, time, progress, pointer, reducedMotion }) {
     this.place(progress, pointer, damp(2, dt), reducedMotion);
+    // the light stays in the scene at intensity 0 (removing it would recompile every program)
+    this.fill.intensity = FILL_INTENSITY * (1 - THREE.MathUtils.smoothstep(progress, 0, 0.14));
     this.skyUniforms.uTime.value = time;
     this.title.update(this.camera, remap(progress, 0.2, 1, 0, 1.4), this.viewport, progress);
   }

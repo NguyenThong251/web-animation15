@@ -28,6 +28,9 @@
   top: 0;
   height: 100lvh;
   overflow: hidden;
+  /* clip, not a scroll container: focusing a tester control while its card is off-stage
+     must not let the browser scroll the stage sideways to reveal it */
+  overflow: clip;
   background: var(--color-accent);
 }
 
@@ -45,6 +48,7 @@
   height: 80vw;
   margin: 0;
   overflow: hidden;
+  overflow: clip;
   border-radius: var(--radius-minimal);
   transform-origin: 50% 40%;
   pointer-events: none;
@@ -116,6 +120,10 @@
 .tw__text {
   color: inherit;
 }
+/* the heading only receives focus from script (when the tester collapses under the focus) */
+.tw__title:focus {
+  outline: none;
+}
 /* SplitText line masks: the base rule gives each mask -0.35em top / -0.5rem bottom margins,
    which collapse between neighbouring masks (only the larger one applies). Giving the next
    mask the sum as its top margin restores line-height spacing. */
@@ -162,7 +170,7 @@
   flex-direction: column;
   gap: var(--sp-xs);
   padding: var(--sp-sm);
-  visibility: hidden;
+  /* faded with opacity only (typeface-wheel.js), so the controls stay in the tab order */
   opacity: 0;
 }
 
@@ -310,6 +318,7 @@
   display: flex;
   align-items: safe center;
   overflow: hidden;
+  overflow: clip;
   border-top: 1px dashed var(--border-dashed-invert);
   border-bottom: 1px dashed var(--border-dashed-invert);
 }
@@ -325,6 +334,12 @@
   color: var(--color-white);
   caret-color: var(--color-primary);
   overflow-wrap: anywhere;
+  /* long or large text scrolls here instead of being cut off (wheel + touch; the JS sets
+     data-lenis-prevent while it overflows) */
+  overflow-x: hidden;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-secondary-invert) transparent;
   outline: none;
   cursor: text;
   transition: font-weight 400ms var(--ease-out-cubic);
@@ -346,8 +361,16 @@
 .tw-tester__meta {
   min-width: 0;
 }
+/* 44 px hit area; the negative margins keep the small label from growing the footer row */
 .tw-tester__reset {
   flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2.75rem;
+  min-height: 2.75rem;
+  margin: -0.875rem -0.5rem;
+  padding-inline: 0.5rem;
   color: var(--color-white);
   transition: color 300ms var(--ease-out-cubic);
 }
@@ -383,6 +406,37 @@
   .tw-tester__foot {
     font-size: 0.64rem;
     line-height: 1.7;
+  }
+}
+/* short card (landscape phones, short laptop windows): one compact head row, the two
+   sliders side by side, tighter gaps — most of the height goes to the specimen */
+@container (max-height: 420px) and (min-width: 560px) {
+  .tw-tester {
+    gap: 0.5rem;
+    padding: 0.75rem var(--sp-xs);
+  }
+  .tw-tester__head {
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+  }
+  .tw-tester__eyebrow {
+    font-size: 1rem;
+    white-space: nowrap;
+  }
+  .tw-seg {
+    grid-template-columns: repeat(4, auto);
+  }
+  .tw-seg__item span {
+    padding: 0.3rem 0.6rem;
+    font-size: 0.875rem;
+  }
+  .tw-tester__sliders {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .tw-range {
+    grid-template-columns: auto minmax(0, 1fr) 3rem;
+    gap: 0.5rem;
   }
 }
 @container (min-width: 900px) {

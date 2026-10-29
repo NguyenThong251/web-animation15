@@ -48,7 +48,7 @@ void main() {
 const LINES = [
   { text: "HIỀN TÀI LÀ NGUYÊN KHÍ", font: FONTS.italic, y: 350, x: () => -720, speed: -800 },
   { text: "CỦA QUỐC GIA — VĂN MIẾU", font: FONTS.regular, y: 142, x: (w) => -60 - w, speed: -200 },
-  { text: "QUỐC GIA", font: FONTS.regular, y: 142, x: () => 40, speed: 200 },
+  { text: "QUỐC TỬ GIÁM", font: FONTS.regular, y: 142, x: () => 40, speed: 200 }, // the row reads "… VĂN MIẾU  QUỐC TỬ GIÁM", the halves sliding apart
   { text: "賢材國家之元氣", font: FONTS.han, y: -66, x: (w) => -w / 2 - 250, speed: 500, han: true },
   { text: "NGUYÊN KHÍ THỊNH THÌ THẾ NƯỚC MẠNH", font: FONTS.regular, y: -274, x: () => -720, speed: -800 },
 ];

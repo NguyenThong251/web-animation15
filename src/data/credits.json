@@ -1,86 +1,78 @@
 [
  {
   "file": "images/khue-van-cac.webp",
-  "title": "Constellation of Literature pavilion - Temple of Literature, Hanoi - DSC04553.JPG",
-  "author": "Daderot",
+  "thumb": "images/thumbs/khue-van-cac.webp",
+  "caption": "Khuê Văn Các, Văn Miếu – Quốc Tử Giám, Hà Nội (ảnh dọc, chụp năm 2014)",
+  "credit": "Ảnh: Daderot",
   "license": "CC0",
+  "title": "Constellation of Literature pavilion - Temple of Literature, Hanoi - DSC04553.JPG",
   "source": "https://commons.wikimedia.org/wiki/File:Constellation_of_Literature_pavilion_-_Temple_of_Literature,_Hanoi_-_DSC04553.JPG"
  },
  {
   "file": "images/khue-van-cac-wide.webp",
-  "title": "Constellation of Literature pavilion - Temple of Literature, Hanoi - DSC04557.JPG",
-  "author": "Daderot",
+  "thumb": "images/thumbs/khue-van-cac-wide.webp",
+  "caption": "Khuê Văn Các, Văn Miếu – Quốc Tử Giám, Hà Nội (ảnh ngang, chụp năm 2014; dùng cho áp phích và ảnh chia sẻ)",
+  "credit": "Ảnh: Daderot",
   "license": "CC0",
+  "title": "Constellation of Literature pavilion - Temple of Literature, Hanoi - DSC04557.JPG",
   "source": "https://commons.wikimedia.org/wiki/File:Constellation_of_Literature_pavilion_-_Temple_of_Literature,_Hanoi_-_DSC04557.JPG"
  },
  {
-  "file": "images/khue-van-cac-wall.webp",
-  "title": "Constellation of Literature pavilion - Temple of Literature, Hanoi - DSC04688.JPG",
-  "author": "Daderot",
-  "license": "CC0",
-  "source": "https://commons.wikimedia.org/wiki/File:Constellation_of_Literature_pavilion_-_Temple_of_Literature,_Hanoi_-_DSC04688.JPG"
- },
- {
-  "file": "images/tu-dien-1651-dep-long.webp",
-  "title": "Dictionarium Annamiticum Lusitanum et Latinum, apex vs. horn.png",
-  "author": "Alexandre de Rhodes",
-  "license": "Public domain",
-  "source": "https://commons.wikimedia.org/wiki/File:Dictionarium_Annamiticum_Lusitanum_et_Latinum,_apex_vs._horn.png"
- },
- {
-  "file": "images/tu-dien-1651-bao-gio.webp",
-  "title": "Dictionarium Annamiticum Lusitanum et Latinum, o-horn-apex.png",
-  "author": "Alexandre de Rhodes",
-  "license": "Public domain",
-  "source": "https://commons.wikimedia.org/wiki/File:Dictionarium_Annamiticum_Lusitanum_et_Latinum,_o-horn-apex.png"
- },
- {
-  "file": "images/gieng-thien-quang.webp",
-  "title": "First courtyard - Temple of Literature, Hanoi - DSC04538.JPG",
-  "author": "Daderot",
-  "license": "CC0",
-  "source": "https://commons.wikimedia.org/wiki/File:First_courtyard_-_Temple_of_Literature,_Hanoi_-_DSC04538.JPG"
- },
- {
-  "file": "images/cong-van-mieu.webp",
-  "title": "Gate - Temple of Literature, Hanoi - DSC04548.JPG",
-  "author": "Daderot",
-  "license": "CC0",
-  "source": "https://commons.wikimedia.org/wiki/File:Gate_-_Temple_of_Literature,_Hanoi_-_DSC04548.JPG"
- },
- {
-  "file": "images/gia-dinh-bao-1866.webp",
-  "title": "Gia Dinh Bao.jpg",
-  "author": "Paulus Cua",
-  "license": "Public domain",
-  "source": "https://commons.wikimedia.org/wiki/File:Gia_Dinh_Bao.jpg"
- },
- {
   "file": "images/kim-van-kieu-tan-truyen.webp",
-  "title": "Kim Vân Kiều tân truyện.jpg",
-  "author": "Nôm Foundation",
+  "thumb": "images/thumbs/kim-van-kieu-tan-truyen.webp",
+  "caption": "Kim Vân Kiều tân truyện (Truyện Kiều), trang nhan đề bản khắc gỗ Phúc Văn Đường, Hà Nội, 1932",
+  "credit": "Tác giả: Nguyễn Du",
   "license": "Public domain",
+  "licenseNote": "Nguyễn Du mất năm 1820",
+  "origin": "Bản gốc: Thư viện Quốc gia Việt Nam (R.2060) · ảnh số hoá: Vietnamese Nôm Preservation Foundation",
+  "via": {
+   "label": "Trang sách tại Vietnamese Nôm Preservation Foundation",
+   "href": "https://lib.nomfoundation.org/collection/1/volume/23"
+  },
+  "title": "Kim Vân Kiều tân truyện.jpg",
   "source": "https://commons.wikimedia.org/wiki/File:Kim_V%C3%A2n_Ki%E1%BB%81u_t%C3%A2n_truy%E1%BB%87n.jpg"
  },
  {
-  "file": "images/bia-tien-si-35.webp",
-  "title": "Stele 35 (replica) from Temple of Literature in Hanoi, view 1 - Museum of Vietnamese History - Ho Chi Minh City - DSC05766.JPG",
-  "author": "Daderot",
-  "license": "CC0",
-  "source": "https://commons.wikimedia.org/wiki/File:Stele_35_(replica)_from_Temple_of_Literature_in_Hanoi,_view_1_-_Museum_of_Vietnamese_History_-_Ho_Chi_Minh_City_-_DSC05766.JPG"
- },
- {
   "file": "images/truyen-kieu-trang.webp",
-  "title": "Tale of Kieu, vol. 24, p.22.jpg",
-  "author": "Nguyen Du",
+  "thumb": "images/thumbs/truyen-kieu-trang.webp",
+  "caption": "Một tờ (hai trang) Kim Vân Kiều tân truyện — Truyện Kiều chữ Nôm, bản khắc gỗ đầu thế kỷ XX",
+  "credit": "Tác giả: Nguyễn Du",
   "license": "Public domain",
+  "licenseNote": "Nguyễn Du mất năm 1820",
+  "origin": "Bản gốc: Thư viện Quốc gia Việt Nam (R.384) · ảnh số hoá: Vietnamese Nôm Preservation Foundation",
+  "via": {
+   "label": "Trang sách tại Vietnamese Nôm Preservation Foundation",
+   "href": "https://lib.nomfoundation.org/collection/1/volume/24/page/22"
+  },
+  "title": "Tale of Kieu, vol. 24, p.22.jpg",
   "source": "https://commons.wikimedia.org/wiki/File:Tale_of_Kieu,_vol._24,_p.22.jpg"
  },
  {
-  "file": "images/doan-truong-tan-thanh.webp",
-  "title": "Đoạn trường tân thanh.png",
-  "author": "vi:Nguyễn Du và những người in bản này.",
+  "file": "images/tu-dien-1651-dep-long.webp",
+  "thumb": "images/thumbs/tu-dien-1651-dep-long.webp",
+  "caption": "Từ điển Việt – Bồ – La (Roma, 1651), cột 218: cụm từ “đẹp lòng người” viết theo chính tả thời đầu",
+  "credit": "Tác giả: Alexandre de Rhodes (Đắc Lộ)",
   "license": "Public domain",
-  "source": "https://commons.wikimedia.org/wiki/File:%C4%90o%E1%BA%A1n_tr%C6%B0%E1%BB%9Dng_t%C3%A2n_thanh.png"
+  "origin": "Ảnh số hoá: Google Books",
+  "via": {
+   "label": "Bản số hoá trên Google Books",
+   "href": "https://books.google.com/books?id=2AdHAAAAcAAJ"
+  },
+  "title": "Dictionarium Annamiticum Lusitanum et Latinum, apex vs. horn.png",
+  "source": "https://commons.wikimedia.org/wiki/File:Dictionarium_Annamiticum_Lusitanum_et_Latinum,_apex_vs._horn.png"
+ },
+ {
+  "file": "images/gia-dinh-bao-1866.webp",
+  "thumb": "images/thumbs/gia-dinh-bao-1866.webp",
+  "caption": "Gia Định báo, trang nhất số 1 năm thứ hai (Sài Gòn, 15/1/1866)",
+  "credit": "Ấn phẩm: Gia Định báo",
+  "license": "Public domain",
+  "origin": "Bản gốc: Bibliothèque nationale de France",
+  "via": {
+   "label": "Source gallica.bnf.fr / BnF",
+   "href": "https://gallica.bnf.fr/ark:/12148/bpt6k1205165w/f5.image"
+  },
+  "title": "Gia Dinh Bao.jpg",
+  "source": "https://commons.wikimedia.org/wiki/File:Gia_Dinh_Bao.jpg"
  }
 ]

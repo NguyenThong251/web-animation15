@@ -129,8 +129,8 @@ const TONE_MARKS = ["\u0300", "\u0301", "\u0309", "\u0303", "\u0323"]; // combin
 const TONE_NAMES = ["huyền", "sắc", "hỏi", "ngã", "nặng"];
 const VOWELS = [
   ["a", "a", "a"],
-  ["ă", "a", "á"],
-  ["â", "a", "ớ"],
+  ["ă", "a", "ă"],
+  ["â", "a", "â"],
   ["e", "e", "e"],
   ["ê", "e", "ê"],
   ["i", "ı", "i"],
@@ -143,7 +143,7 @@ const VOWELS = [
 ].map(([letter, plain, name]) => ({
   letter, // the vowel as written
   plain, // the shared base outline (dotless ı so the dot of i is part of the stack)
-  name, // how the letter is called when spelling aloud ("ă" is read "á", "y" is "i dài")
+  name, // the vowel as chanted when spelling a tone ("ă sắc ắ", "â nặng ậ"); y is called "i dài"
   forms: [letter, ...TONE_MARKS.map((m) => (letter + m).normalize("NFC"))],
 }));
 
@@ -284,7 +284,7 @@ function createMarksPainter() {
         ctx.fillStyle = "rgba(255,255,255,0.6)";
         ctx.fillText("vùng dấu", pad, geo.markTop + lf * 1.3);
         ctx.fillText("chiều cao x", pad, xh - lf * 0.5);
-        ctx.fillText("đường cơ sở", pad, by - lf * 0.5);
+        ctx.fillText("đường chân", pad, by - lf * 0.5);
       }
 
       drawHeader(ctx, w, S, "Dấu thanh", "01", "rgba(255,255,255,0.9)");
@@ -808,6 +808,9 @@ function setupTester(section, app) {
   const reset = root.querySelector("[data-tw-reset]");
   const DEFAULT_TEXT = text.textContent.trim();
   const RANGES = { sm: { min: 18, max: 72, value: 40 }, md: { min: 24, max: 160, value: 88 } };
+  // the small range also serves short screens (landscape phones), where the expanded
+  // card is wide but only a few lines tall
+  const compact = window.matchMedia("(max-width: 767px), (max-height: 499px)");
 
   const state = { italic: false, weight: 400, size: RANGES.md.value, sizeTouched: false };
   const styleOf = () => STYLES.find((s) => s.italic === state.italic && (s.weight >= 600) === state.weight >= 600);
@@ -829,7 +832,18 @@ function setupTester(section, app) {
     fill(size);
     radios.forEach((r) => (r.checked = r.value === style.key));
     meta.textContent = `EB Garamond · ${style.label} · ${state.weight} · ${state.size} px — nhấp vào dòng chữ để gõ thử`;
+    syncOverflow();
   }
+
+  // Long or large text scrolls inside the specimen (overflow-y: auto in the CSS). Lenis only
+  // lets go of the wheel there while there is something to scroll, so a short line never
+  // swallows the page scroll.
+  function syncOverflow() {
+    text.toggleAttribute("data-lenis-prevent", text.scrollHeight > text.clientHeight + 1);
+  }
+  new ResizeObserver(syncOverflow).observe(text);
+  text.addEventListener("input", syncOverflow);
+  text.addEventListener("transitionend", syncOverflow); // a weight glide can add a line
 
   // a preset glides the weight (CSS transition); dragging the slider stays immediate
   let easeTimer = 0;
@@ -857,13 +871,13 @@ function setupTester(section, app) {
 
   // slider range follows the breakpoint
   const applyRange = () => {
-    const r = app.mq.sm.matches ? RANGES.sm : RANGES.md;
+    const r = compact.matches ? RANGES.sm : RANGES.md;
     size.min = r.min;
     size.max = r.max;
     state.size = state.sizeTouched ? Math.min(r.max, Math.max(r.min, state.size)) : r.value;
     render();
   };
-  app.mq.sm.addEventListener("change", applyRange);
+  compact.addEventListener("change", applyRange);
 
   // the editable line: plain text only, a single paragraph, never empty
   text.contentEditable = "plaintext-only";
@@ -891,6 +905,7 @@ function setupTester(section, app) {
   });
   text.addEventListener("blur", () => {
     if (!text.textContent.trim()) text.textContent = DEFAULT_TEXT;
+    syncOverflow();
   });
 
   reset.addEventListener("click", () => {
@@ -898,6 +913,7 @@ function setupTester(section, app) {
     state.weight = 400;
     state.sizeTouched = false;
     text.textContent = DEFAULT_TEXT;
+    text.scrollTop = 0;
     applyRange();
   });
 
@@ -920,6 +936,29 @@ export function init(app) {
   const preview = canvases.list.find((cc) => cc.card === last);
   const tester = setupTester(section, app);
 
+  const sticky = section.querySelector(".tw__sticky");
+  const title = section.querySelector("[data-tw-title]");
+
+  // Keyboard access never depends on the scroll position: the tester controls stay in the
+  // tab order (only faded out while the card rides the wheel). Focusing one scrolls the page
+  // to the point where the card is expanded, so it opens under the focus; if the card
+  // collapses again while focused (scrolling back up), focus moves to the section heading.
+  let openTester = null; // set by the active matchMedia context
+  let opening = false;
+  let openingTimer = 0;
+  const setOpening = (on) => {
+    opening = on;
+    clearTimeout(openingTimer);
+    if (on) openingTimer = setTimeout(() => (opening = false), 2500);
+  };
+  const releaseFocus = () => {
+    if (!opening && tester.root.contains(document.activeElement)) title.focus({ preventScroll: true });
+  };
+  tester.root.addEventListener("focusin", () => {
+    sticky.scrollTop = sticky.scrollLeft = 0; // no-op with overflow: clip; guards older engines
+    openTester?.();
+  });
+
   const mm = gsap.matchMedia();
   // conditions object: the callback runs when any of them matches, so isSm must be listed too
   const conditions = {
@@ -939,31 +978,14 @@ export function init(app) {
     let step = 0;
     let finalW = 0;
     let finalH = 0;
+    let finalCY = 0;
     let u = 1;
     let uEnd = 1;
     let trig = null;
     let expanded = null;
+    let shown = null; // reduced motion: tester visible
     let first = true;
-
-    // wheel geometry for the current stage size (all numbers from the spec)
-    const measure = () => {
-      W = stage.clientWidth;
-      H = stage.clientHeight;
-      box = isMd ? 0.7 * H : 0.8 * W; // square card
-      R = isMd ? W : 1.3 * W; // wheel radius
-      cxStart = isMd ? 0.6 * W : 0.5 * W; // wheel centre drifts left over the scroll
-      cxEnd = 0.5 * W;
-      cy = isMd ? H / 2 + R : H + 0.5 * R; // centre below the stage
-      // angular spacing so neighbouring cards keep a 12 % gap along the rim
-      step = (2 * Math.asin(Math.min(1, Math.max(-1, (1.12 * box) / (2 * R))))) / DEG;
-      finalW = W - (isMd ? 60 : 30);
-      finalH = Math.min(0.9 * H, isMd ? (9 / 16) * finalW : (16 / 9) * finalW);
-      // the last card leaves the wheel when it reaches θ = 182° (just before upright)
-      u = clamp01((225.2 + step * (N - 1) - 182) / 315.2);
-      uEnd = u + (1 - u) / 0.7;
-      trig = orbit(N - 1, u);
-      tester.setRef(isRm ? stage.clientWidth * 0.9 : finalW);
-    };
+    let st = null;
 
     // card i on the rim at progress p: base angle sweeps 225.2° → −90°
     const orbit = (i, p) => {
@@ -976,14 +998,53 @@ export function init(app) {
       };
     };
 
+    // wheel geometry for the current stage size (all numbers from the spec)
+    const measure = () => {
+      W = stage.clientWidth;
+      H = stage.clientHeight;
+      // the fixed header covers the top of the stage below 1024px (from there on the stage
+      // itself starts under it); the expanded tester is fitted and centred in the rest.
+      // .tw's scroll-margin-top is var(--header-height), read back as resolved px.
+      const headerH = parseFloat(getComputedStyle(section).scrollMarginTop) || 0;
+      const safeTop = Math.min(H * 0.5, Math.max(0, headerH - stage.offsetTop));
+      const availH = H - safeTop;
+      box = isMd ? 0.7 * H : 0.8 * W; // square card
+      R = isMd ? W : 1.3 * W; // wheel radius
+      cxStart = isMd ? 0.6 * W : 0.5 * W; // wheel centre drifts left over the scroll
+      cxEnd = 0.5 * W;
+      cy = isMd ? H / 2 + R : H + 0.5 * R; // centre below the stage
+      // angular spacing so neighbouring cards keep a 12 % gap along the rim
+      step = (2 * Math.asin(Math.min(1, Math.max(-1, (1.12 * box) / (2 * R))))) / DEG;
+      finalW = W - (isMd ? 60 : 30);
+      finalH = Math.min(0.9 * availH, isMd ? (9 / 16) * finalW : (16 / 9) * finalW);
+      finalCY = safeTop + availH / 2;
+      // the last card leaves the wheel when it reaches θ = 182° (just before upright)
+      u = clamp01((225.2 + step * (N - 1) - 182) / 315.2);
+      uEnd = u + (1 - u) / 0.7;
+      trig = orbit(N - 1, u);
+      if (isRm) {
+        // parked tester: a 5 % side margin, and a vertical one that shrinks on short screens
+        const mY = availH < 520 ? 0.05 : 0.1;
+        gsap.set(last, {
+          left: 0.05 * W,
+          top: safeTop + mY * availH,
+          width: 0.9 * W,
+          height: (1 - 2 * mY) * availH,
+          clearProps: "transform",
+        });
+      }
+      tester.setRef(isRm ? 0.9 * W : finalW);
+    };
+
     const setExpanded = (on, instant) => {
       if (expanded === on) return;
       expanded = on;
       last.style.pointerEvents = on ? "auto" : "none";
-      tester.root.inert = !on;
-      if (!on && tester.root.contains(document.activeElement)) document.activeElement.blur();
+      if (on) setOpening(false);
+      else releaseFocus();
       const duration = instant ? 0 : 0.35;
-      gsap.to(tester.root, { autoAlpha: on ? 1 : 0, duration, ease: "power2.out", overwrite: true });
+      // opacity only (no visibility): the controls must stay focusable while faded out
+      gsap.to(tester.root, { opacity: on ? 1 : 0, duration, ease: "power2.out", overwrite: true });
       gsap.to(preview.canvas, { autoAlpha: on ? 0 : 1, duration, ease: "power2.out", overwrite: true });
       preview.enabled = !on; // the live DOM tester replaces the canvas preview
     };
@@ -996,7 +1057,7 @@ export function init(app) {
           if (p >= u) {
             pos = {
               x: lerp(trig.x, W / 2, k),
-              y: lerp(trig.y, H / 2, k),
+              y: lerp(trig.y, finalCY, k),
               rotation: lerp(trig.rotation, 0, k),
               width: lerp(box, finalW, k),
               height: lerp(box, finalH, k),
@@ -1020,22 +1081,40 @@ export function init(app) {
       setExpanded(p >= u, immediate);
     };
 
+    // keyboard entry (see focusin above): scroll to where the tester is open
+    openTester = () => {
+      if (!st || (isRm ? shown : expanded)) return;
+      const target = st.start + (st.end - st.start) * 0.985;
+      setOpening(true);
+      requestAnimationFrame(() => {
+        if (app.lenis) app.lenis.scrollTo(target, isRm ? { immediate: true } : { duration: 1.2 });
+        else window.scrollTo(0, target);
+      });
+    };
+
+    // Geometry first: when this context re-runs at a breakpoint change, ScrollTrigger can
+    // call onUpdate before onRefresh, and layout() needs every number above.
+    measure();
+
     if (isRm) {
       // Reduced motion: no wheel. The copy and the tester (parked in the middle of the stage)
       // each get the stage to themselves and swap with a scroll-tied opacity crossfade at the
       // point where the wheel would expand the tester — the dark copy never sits on the card.
       gsap.set(cards.slice(0, -1), { autoAlpha: 0 });
       canvases.list.forEach((cc) => (cc.enabled = false));
-      gsap.set(last, { left: "5%", top: "10%", width: "90%", height: "80%", clearProps: "transform" });
       setExpanded(true, true);
       const apply = (p) => {
         const a = smoothstep(u - 0.03, u + 0.03, p);
         gsap.set(copy, { autoAlpha: 1 - smoothstep(u - 0.1, u - 0.04, p) });
-        gsap.set(last, { autoAlpha: a, pointerEvents: a > 0.5 ? "auto" : "none" });
-        tester.root.inert = a <= 0.5;
-        if (a <= 0.5 && tester.root.contains(document.activeElement)) document.activeElement.blur();
+        // opacity, not autoAlpha: the faded-out tester stays reachable with Tab
+        gsap.set(last, { opacity: a, visibility: "inherit", pointerEvents: a > 0.5 ? "auto" : "none" });
+        const on = a > 0.5;
+        if (on === shown) return;
+        shown = on;
+        if (on) setOpening(false);
+        else releaseFocus();
       };
-      ScrollTrigger.create({
+      st = ScrollTrigger.create({
         trigger: section,
         start: "top bottom",
         end: "bottom bottom",
@@ -1047,9 +1126,10 @@ export function init(app) {
         onUpdate: (self) => apply(self.progress),
       });
     } else {
-      // autoAlpha: undo the reduced-motion crossfade if the preference changed at runtime
-      gsap.set(cards, { xPercent: -50, yPercent: -50, autoAlpha: 1 });
-      ScrollTrigger.create({
+      // autoAlpha / left / top: undo the reduced-motion layout if the preference changed at runtime
+      gsap.set(cards, { xPercent: -50, yPercent: -50, left: 0, top: 0, autoAlpha: 1 });
+      gsap.set(cards.slice(0, -1), { width: box, height: box });
+      st = ScrollTrigger.create({
         trigger: section,
         start: "top bottom",
         end: "bottom bottom",
@@ -1073,7 +1153,8 @@ export function init(app) {
       // non-GSAP state the context cannot revert by itself
       canvases.list.forEach((cc) => (cc.enabled = true));
       last.style.pointerEvents = "";
-      tester.root.inert = true;
+      openTester = null;
+      setOpening(false);
     };
   });
 

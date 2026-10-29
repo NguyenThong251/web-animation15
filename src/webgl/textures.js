@@ -1,5 +1,5 @@
 // Procedural textures (nothing is downloaded except the depth photo):
-//  · dot pattern   6×6 paper micro-dot tile (two ink pixels, staggered)
+//  · dot pattern   7×7 paper micro-dot tile (two ink pixels on an oblique stagger)
 //  · advect        128² tileable flow-noise vector field for the ink splat
 //  · reveal mask   512² blurry ink blot for the intro reveal
 //  · depth map     synthetic depth for the 2.5D photo, preprocessed like the reference (§5.3)
@@ -75,15 +75,23 @@ export function boxBlur(src, w, h, r, out = new Float32Array(src.length)) {
 
 /* ---------------------------------------------------------------- dot pattern */
 
-// 6×6 white tile with two black pixels at (5,1) and (2,4): sampled 120× per screen height it
-// becomes the staggered micro-dot screen of the "paper" background (SPEC_WEBGL §8.3).
+// Our own micro-dot screen for the "paper" backgrounds: a 7×7 white tile with two ink pixels at
+// (1,1) and (4,5). The second dot sits (3,4) texels off the first, so the dots fall on an oblique
+// lattice (nearest neighbours (−3,3) and (3,4)) instead of a square quincunx. `repeat` (tiles per
+// screen height) keeps a texel ≈ 1.25 px at 900 px tall, so the dots stay ≈ 5–6 px apart.
+export const DOT_PATTERN = {
+  size: 7,
+  dots: [
+    [1, 1],
+    [4, 5],
+  ],
+  repeat: 103,
+};
+
 export function createDotPatternTexture() {
-  const size = 6;
+  const { size, dots } = DOT_PATTERN;
   const data = new Uint8Array(size * size * 4).fill(255);
-  for (const [x, y] of [
-    [5, 1],
-    [2, 4],
-  ]) {
+  for (const [x, y] of dots) {
     const i = (y * size + x) * 4;
     data[i] = data[i + 1] = data[i + 2] = 0;
   }

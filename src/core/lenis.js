@@ -53,10 +53,21 @@ export function init(app) {
   app.on("webgl:error", start);
   if (app.state.webglFailed || app.state.revealed) start();
 
+  // A refresh (e.g. gsap.matchMedia rebuilding triggers when the window crosses 768px) parks the
+  // window at 0 while it measures; Lenis would adopt that 0 as its target. Remember where the reader
+  // was — as a fraction of the page, since breakpoint swaps change section heights — and go back.
+  let savedProgress = null;
+  app.ScrollTrigger.addEventListener("refreshInit", () => {
+    if (savedProgress === null && started && lenis.limit > 0) savedProgress = lenis.targetScroll / lenis.limit;
+  });
   // layout changes (sections mounting, fonts swapping) → keep Lenis' limit in sync
   app.ScrollTrigger.addEventListener("refresh", () => {
     lenis.resize();
     app.state.limit = lenis.limit;
+    if (savedProgress === null) return;
+    const y = Math.round(savedProgress * lenis.limit);
+    savedProgress = null;
+    if (Math.abs(lenis.scroll - y) > 1) lenis.scrollTo(y, { immediate: true, force: true });
   });
   app.on("resize", () => lenis.resize());
 }

@@ -1,5 +1,5 @@
 // Incense smoke / dust motes drifting in the stele's light (SPEC_WEBGL §5.2 FloatingParticles):
-// instanced camera-facing quads, positions animated entirely on the GPU with 3-octave noise drift,
+// instanced camera-facing quads, positions animated entirely on the GPU with 2-octave noise drift,
 // a triangular life cycle and a soft radial sprite, additively blended.
 import * as THREE from "three";
 import { SIMPLEX3 } from "./glsl.js";
@@ -22,9 +22,10 @@ attribute float aLife;
 varying vec2 vUv;
 varying float vAlpha;
 ${SIMPLEX3}
-// 3 octaves remapped to 0..1
-float n3(vec3 p) {
-  float v = kvSimplex(p) * 0.57 + kvSimplex(p * 2.03) * 0.29 + kvSimplex(p * 4.01) * 0.14;
+// 2 octaves remapped to 0..1 (a third octave added nothing visible on 1–2 cm motes and made this
+// the heaviest program to link: 9 inlined simplex evaluations per vertex, now 6)
+float n2(vec3 p) {
+  float v = kvSimplex(p) * 0.66 + kvSimplex(p * 2.03) * 0.34;
   return v * 0.5 + 0.5;
 }
 void main() {
@@ -33,7 +34,7 @@ void main() {
   float life = fract(aLife + uTime * uLifeSpeed * aSpeed);
   float tri = 1.0 - abs(life * 2.0 - 1.0);
   vec3 m = aBase * uSpaceScale * uNoiseScale + vec3(o, o * 0.63, o * 0.39);
-  vec3 off = (vec3(n3(m), n3(m + vec3(11.7, 3.1, 7.9)), n3(m + vec3(4.3, 13.2, 5.4))) - 0.5) * uNoiseIntensity;
+  vec3 off = (vec3(n2(m), n2(m + vec3(11.7, 3.1, 7.9)), n2(m + vec3(4.3, 13.2, 5.4))) - 0.5) * uNoiseIntensity;
   vec3 pos = aBase * uSpaceScale + off + vec3(0.0, sin(o * 1.6) * uYDrift, 0.0) + uOrigin * uSpaceScale;
   vec4 mv = modelViewMatrix * vec4(pos, 1.0);
   mv.xy += position.xy * aSize * uSizeMultiplier * tri; // billboard in view space

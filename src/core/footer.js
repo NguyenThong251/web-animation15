@@ -3,21 +3,9 @@
 // "Nguồn ảnh & giấy phép" dialog from src/data/credits.json.
 import credits from "../data/credits.json";
 
-// Vietnamese captions for each archive image (the Commons titles stay as the source reference)
-const CAPTIONS = {
-  "images/khue-van-cac.webp": "Khuê Văn Các, ảnh dọc",
-  "images/khue-van-cac-wide.webp": "Khuê Văn Các, ảnh ngang",
-  "images/khue-van-cac-wall.webp": "Khuê Văn Các, một góc nhìn khác",
-  "images/tu-dien-1651-dep-long.webp": "Từ điển Việt – Bồ – La (1651), mục “đẹp lòng”",
-  "images/tu-dien-1651-bao-gio.webp": "Từ điển Việt – Bồ – La (1651), một đoạn trích khác",
-  "images/gieng-thien-quang.webp": "Sân thứ nhất của Văn Miếu",
-  "images/cong-van-mieu.webp": "Một cổng của Văn Miếu",
-  "images/gia-dinh-bao-1866.webp": "Gia Định báo",
-  "images/kim-van-kieu-tan-truyen.webp": "Kim Vân Kiều tân truyện, bản in khắc gỗ",
-  "images/bia-tien-si-35.webp": "Bia tiến sĩ số 35 (bản sao) tại Bảo tàng Lịch sử Việt Nam – TP. Hồ Chí Minh",
-  "images/truyen-kieu-trang.webp": "Một trang Truyện Kiều chữ Nôm",
-  "images/doan-truong-tan-thanh.webp": "Trang nhan đề Đoạn trường tân thanh",
-};
+// Each entry carries its own Vietnamese caption, credit line and provenance; the Commons file page
+// stays the reference for every image. Thumbnails are 112 px crops (images/thumbs/) so opening the
+// dialog never decodes the full-size scans.
 const LICENCE_VI = {
   CC0: "CC0 1.0 — hiến tặng vào phạm vi công cộng",
   "Public domain": "Phạm vi công cộng",
@@ -29,8 +17,15 @@ const el = (tag, cls, text) => {
   if (text != null) n.textContent = text;
   return n;
 };
-// Commons author fields sometimes carry an interwiki prefix ("vi:…") or a trailing full stop
-const cleanAuthor = (a) => String(a || "").replace(/^[a-z]{2,3}:/i, "").replace(/\.\s*$/, "").trim();
+const extLink = (text, href, title) => {
+  const a = el("a", null, text);
+  a.href = href;
+  a.target = "_blank";
+  a.rel = "noopener noreferrer";
+  if (title) a.title = title;
+  a.append(el("span", "sr-only", " (mở trong thẻ mới)"));
+  return a;
+};
 
 function fillCredits(list) {
   if (!list || list.dataset.filled) return;
@@ -38,22 +33,22 @@ function fillCredits(list) {
   for (const c of credits) {
     const li = el("li", "credits__item");
     const thumb = el("img", "credits__thumb");
-    thumb.src = c.file;
+    thumb.src = c.thumb || c.file;
     thumb.alt = "";
+    thumb.width = 112;
+    thumb.height = 112;
     thumb.loading = "lazy";
     thumb.decoding = "async";
+    const licence = LICENCE_VI[c.license] || c.license;
     const text = el("div", "credits__text");
     text.append(
-      el("p", "t-body credits__name", CAPTIONS[c.file] || c.title),
-      el("p", "t-small credits__meta", `Tác giả: ${cleanAuthor(c.author)} · Giấy phép: ${LICENCE_VI[c.license] || c.license}`),
+      el("p", "t-body credits__name", c.caption || c.title),
+      el("p", "t-small credits__meta", `${c.credit} · Giấy phép: ${licence}${c.licenseNote ? ` (${c.licenseNote})` : ""}`),
     );
+    if (c.origin) text.append(el("p", "t-small credits__meta", c.origin));
     const links = el("p", "t-small credits__links");
-    const a = el("a", null, "Trang nguồn trên Wikimedia Commons");
-    a.href = c.source;
-    a.target = "_blank";
-    a.rel = "noopener noreferrer";
-    a.title = c.title;
-    links.append(a);
+    links.append(extLink("Trang nguồn trên Wikimedia Commons", c.source, c.title));
+    if (c.via?.href) links.append(extLink(c.via.label, c.via.href));
     text.append(links);
     li.append(thumb, text);
     list.append(li);

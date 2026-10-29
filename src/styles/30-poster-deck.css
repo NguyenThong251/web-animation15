@@ -165,6 +165,19 @@
   display: none;
 }
 
+/* mock-up disclosure, centred under the deck (above the cards so the collage never hides it) */
+.deck__note {
+  position: absolute;
+  left: var(--margin);
+  right: var(--margin);
+  bottom: var(--sp-sm);
+  z-index: 40;
+  margin: 0;
+  text-align: center;
+  color: var(--color-accent-foreground);
+  pointer-events: none;
+}
+
 /* ---------- mobile carousel (<768) ---------- */
 @media (max-width: 767px) {
   .deck {
@@ -256,6 +269,11 @@
   .deck__dots .deck__dot:nth-child(3) {
     --dot-scale: 0.3;
   }
+  .deck__note {
+    position: static;
+    grid-column: 1;
+    padding-inline: var(--margin);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -328,8 +346,8 @@
   width: 100%;
   height: 100%;
   max-width: none;
-  object-fit: cover;
-  object-position: 26% 50%;
+  object-fit: cover; /* images/posters/khue-van-cac-poster.webp is already the 4:5 crop (was 26% 50% of the wide photo) */
+  object-position: 50% 50%;
   filter: grayscale(1) contrast(1.6) brightness(1.2);
   mix-blend-mode: multiply;
 }
@@ -343,15 +361,26 @@
 .pd-hanoi__shade {
   position: absolute;
   inset: 0;
+  /* top band runs down past the rubric (34–37cqw ≈ 27–30% of the height) */
   background: linear-gradient(
     180deg,
     rgb(24 26 92 / 0.62) 0%,
-    rgb(24 26 92 / 0.28) 20%,
-    rgb(24 26 92 / 0) 34%,
+    rgb(24 26 92 / 0.5) 20%,
+    rgb(24 26 92 / 0.56) 30%,
+    rgb(24 26 92 / 0) 40%,
     rgb(24 26 92 / 0) 54%,
     rgb(24 26 92 / 0.42) 72%,
     rgb(20 22 80 / 0.86) 100%
   );
+}
+/* right-hand band behind the cover lines (46–83cqw ≈ 37–67% of the height), soft top and bottom edges */
+.pd-hanoi__shade::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(270deg, rgb(24 26 92 / 0.74) 0%, rgb(24 26 92 / 0.66) 34%, rgb(24 26 92 / 0) 54%);
+  -webkit-mask-image: linear-gradient(180deg, transparent 28%, #000 35%, #000 68%, transparent 76%);
+  mask-image: linear-gradient(180deg, transparent 28%, #000 35%, #000 68%, transparent 76%);
 }
 .pd-hanoi__top {
   position: absolute;
@@ -389,11 +418,14 @@
   display: flex;
   align-items: center;
   gap: 2.2cqw;
-  font-size: 2.15cqw;
-  letter-spacing: 0.24em;
+  font-size: 2.6cqw;
+  font-weight: 500;
+  letter-spacing: 0.22em;
   text-transform: uppercase;
   color: #fff4fb;
-  text-shadow: 0 0 1.6cqw rgb(24 26 92 / 0.55);
+  text-shadow:
+    0 0 0.35cqw rgb(18 20 66 / 0.9),
+    0 0 1.6cqw rgb(18 20 66 / 0.8);
 }
 .pd-hanoi__rubric i {
   flex: 1;
@@ -412,7 +444,9 @@
   font-size: 2.6cqw;
   line-height: 1.25;
   list-style: none;
-  text-shadow: 0 0 2cqw rgb(18 20 66 / 0.45);
+  text-shadow:
+    0 0 0.35cqw rgb(18 20 66 / 0.8),
+    0 0 2cqw rgb(18 20 66 / 0.6);
 }
 .pd-hanoi__lines li {
   padding-top: 1.8cqw;

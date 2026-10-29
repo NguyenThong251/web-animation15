@@ -30,7 +30,7 @@ export class SteleScene extends BaseScene {
   }
 
   async load({ isMobile, quality }) {
-    // the builder's default columns (title column + phrases from the Hán subset) read as a full stele
+    // the builder's default columns: the 1442 heading, then the stele's passage 賢材國家之元氣…
     const built = await this.models.buildSteleOnTurtle(THREE, { title: STELE_TEXT.title, quality });
     const { group, anchors, size } = built;
     prepareShadowCasters(group);
