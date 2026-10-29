@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Khuê Văn — Hồn chữ Việt, từ bia đá đến Quốc ngữ</title>
+    <meta name="description" content="Khuê Văn: hành trình chữ Việt từ chữ Hán trên 82 tấm bia tiến sĩ ở Văn Miếu, qua chữ Nôm của Truyện Kiều, đến chữ Quốc ngữ — một trang trình diễn kiểu chữ serif tiếng Việt." />
+    <meta name="theme-color" content="#5b74eb" />
+    <meta property="og:title" content="Khuê Văn — Hồn chữ Việt" />
+    <meta property="og:description" content="Từ bia đá Văn Miếu đến chữ Quốc ngữ." />
+    <meta property="og:image" content="images/khue-van-cac-wide.webp" />
+    <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+    <link rel="preload" href="fonts/EBGaramond-VF.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="fonts/EBGaramond-Italic-VF.woff2" as="font" type="font/woff2" crossorigin />
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">Bỏ qua, tới nội dung chính</a>
+
+    <!-- fixed layers (z-order low → high): webgl canvas 0 · sections 10 · scroll follower 95 · header 96 · scrollbar 97 · loader 99 -->
+    <div id="webgl" aria-hidden="true"></div>
+    <!--#include src/partials/loader.html -->
+    <!--#include src/partials/header.html -->
+
+    <main id="main-content" data-route="/">
+      <div data-scene-scroll-root>
+        <!-- 1 · hero: 600svh of scroll that flies the camera over Văn Miếu -->
+        <div data-scene-scroll-segment="hero" id="nav-anchor-nen-mong" data-nav="nen-mong">
+          <!--#include src/partials/hero.html -->
+        </div>
+
+        <!-- 2 · one doctoral stele on its stone turtle + two paragraphs floating over it -->
+        <div data-scene-scroll-segment="stele">
+          <!--#include src/partials/stele.html -->
+        </div>
+
+        <!-- 3 · 2.5D colour photo + sticky text and parallax archive tiles -->
+        <div data-scene-scroll-segment="depth" id="nav-anchor-khao-cuu" data-nav="khao-cuu">
+          <!--#include src/partials/sticky-text.html -->
+        </div>
+
+        <!-- 4 · flat paper behind ~25 screens of DOM -->
+        <div data-scene-scroll-segment="paper">
+          <!--#include src/partials/typeface-wheel.html -->
+          <!--#include src/partials/poster-deck.html -->
+          <!--#include src/partials/glyphset.html -->
+        </div>
+
+        <!-- 5 · brush meets pen nib (400svh), star iris into the closing inscription wall -->
+        <div data-scene-scroll-segment="hands" id="nav-anchor-tai-ve" data-nav="tai-ve">
+          <!--#include src/partials/hands.html -->
+        </div>
+
+        <!-- 6 · zero-height anchor for the final scene -->
+        <div data-scene-scroll-segment="text"></div>
+      </div>
+
+      <!--#include src/partials/download.html -->
+      <!--#include src/partials/footer.html -->
+    </main>
+
+    <!--#include src/partials/scroll-follower.html -->
+    <!--#include src/partials/scrollbar.html -->
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>

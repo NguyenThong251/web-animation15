@@ -1,0 +1,185 @@
+<!-- Bộ ký tự (glyphset): giant title, intro, glyph groups (rendered by src/sections/glyphset.js
+     from src/data/glyphs.json), sticky aside with weight picker + metric inspector. -->
+<section
+  class="section glyphset"
+  id="nav-anchor-bo-ky-tu"
+  data-nav="bo-ky-tu"
+  data-glyphset
+  aria-labelledby="glyphset-heading"
+>
+  <div>
+    <div class="spacer-2xl" aria-hidden="true"></div>
+    <div class="spacer-2xl" aria-hidden="true"></div>
+
+    <div class="container">
+      <div class="grid">
+        <div class="gs-title" data-motion-title>
+          <h2 class="sr-only" id="glyphset-heading">Bộ ký tự</h2>
+          <!-- One <text> per letter so each can pop up on its own. x = kerned pen position of the letter in
+               "BỘ KÝ TỰ" at 1000 units/em; the viewBox is the ink box of the whole line (incl. the dots below Ộ, Ự). -->
+          <svg class="gs-title__svg" viewBox="15 -842 4450 1051" aria-hidden="true" focusable="false">
+            <text x="0" y="0">B</text>
+            <text x="587" y="0">Ộ</text>
+            <text x="1550" y="0">K</text>
+            <text x="2231" y="0">Ý</text>
+            <text x="3009" y="0">T</text>
+            <text x="3679" y="0">Ự</text>
+          </svg>
+        </div>
+        <div class="gs-spacer-md" aria-hidden="true"></div>
+        <div class="gs-intro">
+          <p class="t-large trim" data-motion-text>
+            Tiếng Việt viết bằng 29 chữ cái, 6 thanh điệu và một hệ dấu phụ dày đặc: 134 chữ cái mang dấu — hoa và
+            thường — không có trong bảng chữ La-tinh cơ bản. Dưới đây là các nhóm ký tự cần cho một văn bản tiếng Việt
+            hoàn chỉnh, cùng vài chữ Hán để nhớ những tấm bia đã khắc nên lịch sử chữ viết của chúng ta.
+          </p>
+        </div>
+      </div>
+
+      <div class="spacer-2xl" aria-hidden="true"></div>
+
+      <div class="grid gs-body">
+        <!-- glyph groups: filled by glyphset.js -->
+        <div class="gs-groups" data-glyph-groups></div>
+
+        <aside class="gs-aside" aria-label="Công cụ xem ký tự">
+          <span class="gs-aside__label t-body trim" id="gs-weight-label" data-motion-text>Chọn độ đậm</span>
+
+          <!-- < 1024px: native select under a styled box -->
+          <label class="gs-select">
+            <select class="gs-select__native" aria-labelledby="gs-weight-label" data-weight-select>
+              <option value="400-normal" data-weight="400" data-style="normal" selected>Thường</option>
+              <option value="500-normal" data-weight="500" data-style="normal">Vừa</option>
+              <option value="600-normal" data-weight="600" data-style="normal">Đậm vừa</option>
+              <option value="700-normal" data-weight="700" data-style="normal">Đậm</option>
+              <option value="800-normal" data-weight="800" data-style="normal">Rất đậm</option>
+              <option value="400-italic" data-weight="400" data-style="italic">Nghiêng</option>
+              <option value="700-italic" data-weight="700" data-style="italic">Đậm nghiêng</option>
+            </select>
+            <span class="gs-select__box">
+              <span class="gs-select__value t-h6" aria-hidden="true" data-weight-current>Thường</span>
+              <svg class="gs-icon gs-select__chevron" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <path d="M7 10l5 5 5-5" />
+              </svg>
+            </span>
+          </label>
+
+          <!-- ≥ 1024px: custom listbox dropdown (panel wipes down over the trigger) -->
+          <div class="gs-dd" data-weight-dropdown>
+            <button
+              type="button"
+              class="gs-dd__trigger animated-gradient-border group-clip"
+              aria-haspopup="listbox"
+              aria-expanded="false"
+              aria-controls="gs-dd-panel"
+              aria-label="Chọn độ đậm: Thường"
+            >
+              <span class="gs-dd__fill" aria-hidden="true"></span>
+              <span class="gs-dd__row">
+                <span class="gs-dd__value t-h6" aria-hidden="true">
+                  <span class="text-clip"><span data-label="Thường" data-weight-current>Thường</span></span>
+                </span>
+                <svg class="gs-icon gs-dd__chevron" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                  <path d="M7 10l5 5 5-5" />
+                </svg>
+              </span>
+            </button>
+            <div class="gs-dd__panel animated-gradient-border" id="gs-dd-panel" aria-hidden="true" inert>
+              <div class="gs-dd__inner">
+                <button type="button" class="gs-dd__close" data-motion-item tabindex="-1" aria-label="Đóng danh sách độ đậm">
+                  <span class="t-h6" data-weight-current>Thường</span>
+                  <svg class="gs-icon gs-dd__chevron is-up" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                    <path d="M7 10l5 5 5-5" />
+                  </svg>
+                </button>
+                <div role="listbox" aria-labelledby="gs-weight-label">
+                  <div role="none" data-motion-item>
+                    <div class="gs-dd__rule"></div>
+                    <button type="button" role="option" class="gs-dd__option" data-value="400-normal" aria-selected="true" tabindex="-1">
+                      <span>Thường</span><span class="gs-dd__swipe" aria-hidden="true"></span>
+                    </button>
+                  </div>
+                  <div role="none" data-motion-item>
+                    <div class="gs-dd__rule"></div>
+                    <button type="button" role="option" class="gs-dd__option" data-value="500-normal" aria-selected="false" tabindex="-1">
+                      <span>Vừa</span><span class="gs-dd__swipe" aria-hidden="true"></span>
+                    </button>
+                  </div>
+                  <div role="none" data-motion-item>
+                    <div class="gs-dd__rule"></div>
+                    <button type="button" role="option" class="gs-dd__option" data-value="600-normal" aria-selected="false" tabindex="-1">
+                      <span>Đậm vừa</span><span class="gs-dd__swipe" aria-hidden="true"></span>
+                    </button>
+                  </div>
+                  <div role="none" data-motion-item>
+                    <div class="gs-dd__rule"></div>
+                    <button type="button" role="option" class="gs-dd__option" data-value="700-normal" aria-selected="false" tabindex="-1">
+                      <span>Đậm</span><span class="gs-dd__swipe" aria-hidden="true"></span>
+                    </button>
+                  </div>
+                  <div role="none" data-motion-item>
+                    <div class="gs-dd__rule"></div>
+                    <button type="button" role="option" class="gs-dd__option" data-value="800-normal" aria-selected="false" tabindex="-1">
+                      <span>Rất đậm</span><span class="gs-dd__swipe" aria-hidden="true"></span>
+                    </button>
+                  </div>
+                  <div role="none" data-motion-item>
+                    <div class="gs-dd__rule"></div>
+                    <button type="button" role="option" class="gs-dd__option" data-value="400-italic" aria-selected="false" tabindex="-1">
+                      <span>Nghiêng</span><span class="gs-dd__swipe" aria-hidden="true"></span>
+                    </button>
+                  </div>
+                  <div role="none" data-motion-item>
+                    <div class="gs-dd__rule"></div>
+                    <button type="button" role="option" class="gs-dd__option" data-value="700-italic" aria-selected="false" tabindex="-1">
+                      <span>Đậm nghiêng</span><span class="gs-dd__swipe" aria-hidden="true"></span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ≥ 1024px: inspector. 1460-unit square; metric rows are positioned by glyphset.js -->
+          <div class="gs-inspector animated-gradient-border" id="target-glyph" aria-live="polite">
+            <div class="gs-inspector__panel">
+              <div class="gs-inspector__stage" aria-hidden="true">
+                <div class="gs-inspector__square">
+                  <svg class="gs-inspector__svg" viewBox="0 0 1460 1460" preserveAspectRatio="xMidYMid meet" focusable="false">
+                    <text x="730" y="1137.4" font-size="1131.8" text-anchor="middle" data-inspector-glyph>Ẵ</text>
+                  </svg>
+                  <div class="gs-metric is-accent" data-metric="stack">
+                    <span class="gs-metric__label t-small">Vùng dấu</span><span class="gs-metric__line"></span><span class="gs-metric__value t-small">966</span>
+                  </div>
+                  <div class="gs-metric" data-metric="ascender">
+                    <span class="gs-metric__label t-small">Đường đỉnh</span><span class="gs-metric__line"></span><span class="gs-metric__value t-small">704</span>
+                  </div>
+                  <div class="gs-metric" data-metric="capHeight">
+                    <span class="gs-metric__label t-small">Chữ hoa</span><span class="gs-metric__line"></span><span class="gs-metric__value t-small">650</span>
+                  </div>
+                  <div class="gs-metric" data-metric="xHeight">
+                    <span class="gs-metric__label t-small">Chiều cao x</span><span class="gs-metric__line"></span><span class="gs-metric__value t-small">400</span>
+                  </div>
+                  <div class="gs-metric" data-metric="baseline">
+                    <span class="gs-metric__label t-small">Đường chân</span><span class="gs-metric__line"></span><span class="gs-metric__value t-small">0</span>
+                  </div>
+                  <div class="gs-metric" data-metric="descender">
+                    <span class="gs-metric__label t-small">Đường đáy</span><span class="gs-metric__line"></span><span class="gs-metric__value t-small">−285</span>
+                  </div>
+                </div>
+              </div>
+              <p class="gs-inspector__caption t-small" aria-hidden="true">
+                <span class="gs-inspector__caption-label">Ký tự đang chọn</span>
+                <span class="gs-inspector__caption-name"><span data-glyph-char>Ẵ</span><span data-glyph-desc> — A trăng, dấu ngã</span></span>
+                <span class="gs-inspector__caption-code" data-glyph-code>U+1EB4</span>
+              </p>
+              <span class="sr-only" data-glyph-sr>Ký tự đang chọn: Ẵ — A trăng, dấu ngã, U+1EB4</span>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </div>
+
+    <div class="spacer-2xl" aria-hidden="true"></div>
+  </div>
+</section>

@@ -1,0 +1,105 @@
+<!-- Footer (immersive): black text block + white strip of three text marks (a CSS marquee under 768px).
+     core/footer.js reports its scroll progress to WebGL and fills the credits dialog. -->
+<footer class="site-footer" data-footer data-variant="immersive">
+  <div class="site-footer__main">
+    <p class="t-body trim trim--body site-footer__paragraph">Khuê Văn là dự án trình diễn phi thương mại về lịch sử chữ Việt, làm để học kỹ thuật web. Kiểu chữ: EB Garamond và Noto Serif TC (SIL Open Font License 1.1). Ảnh tư liệu: Wikimedia Commons (CC0 và phạm vi công cộng).</p>
+    <div class="site-footer__meta">
+      <nav class="site-footer__nav" aria-label="Thông tin dự án">
+        <ul>
+          <li>
+            <button type="button" class="site-footer__link" data-credits-open aria-haspopup="dialog" aria-controls="credits-dialog">
+              <span class="t-small trim trim--small">Nguồn ảnh &amp; giấy phép</span>
+            </button>
+          </li>
+          <li>
+            <a class="site-footer__link" href="https://michelangelus.studiogusto.com/" target="_blank" rel="noopener noreferrer">
+              <span class="t-small trim trim--small">Cảm hứng thiết kế: Michelangelus — Studiogusto</span>
+              <span class="sr-only">(mở trong thẻ mới)</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+      <p class="t-small trim trim--small site-footer__copy">© 2026 Khuê Văn</p>
+    </div>
+  </div>
+
+  <div class="site-footer__marks">
+    <div class="site-footer__loop">
+      <!-- four identical copies → seamless −25% loop; copies 2–4 are hidden ≥768px and under reduced motion -->
+      <div class="site-footer__set">
+        <hr class="site-footer__sep site-footer__sep--lead" aria-hidden="true" />
+        <p class="site-footer__mark"><span class="site-footer__mark-name">Văn Miếu</span><span class="site-footer__mark-dot"> · </span><span class="site-footer__mark-note">1070</span></p>
+        <hr class="site-footer__sep" aria-hidden="true" />
+        <p class="site-footer__mark"><span class="site-footer__mark-name">Truyện Kiều</span><span class="site-footer__mark-dot"> · </span><span class="site-footer__mark-note">chữ Nôm</span></p>
+        <hr class="site-footer__sep" aria-hidden="true" />
+        <p class="site-footer__mark"><span class="site-footer__mark-name">Quốc ngữ</span><span class="site-footer__mark-dot"> · </span><span class="site-footer__mark-note">1651</span></p>
+      </div>
+      <div class="site-footer__set site-footer__set--copy" aria-hidden="true">
+        <hr class="site-footer__sep site-footer__sep--lead" />
+        <p class="site-footer__mark"><span class="site-footer__mark-name">Văn Miếu</span><span class="site-footer__mark-dot">·</span><span class="site-footer__mark-note">1070</span></p>
+        <hr class="site-footer__sep" />
+        <p class="site-footer__mark"><span class="site-footer__mark-name">Truyện Kiều</span><span class="site-footer__mark-dot">·</span><span class="site-footer__mark-note">chữ Nôm</span></p>
+        <hr class="site-footer__sep" />
+        <p class="site-footer__mark"><span class="site-footer__mark-name">Quốc ngữ</span><span class="site-footer__mark-dot">·</span><span class="site-footer__mark-note">1651</span></p>
+      </div>
+      <div class="site-footer__set site-footer__set--copy" aria-hidden="true">
+        <hr class="site-footer__sep site-footer__sep--lead" />
+        <p class="site-footer__mark"><span class="site-footer__mark-name">Văn Miếu</span><span class="site-footer__mark-dot">·</span><span class="site-footer__mark-note">1070</span></p>
+        <hr class="site-footer__sep" />
+        <p class="site-footer__mark"><span class="site-footer__mark-name">Truyện Kiều</span><span class="site-footer__mark-dot">·</span><span class="site-footer__mark-note">chữ Nôm</span></p>
+        <hr class="site-footer__sep" />
+        <p class="site-footer__mark"><span class="site-footer__mark-name">Quốc ngữ</span><span class="site-footer__mark-dot">·</span><span class="site-footer__mark-note">1651</span></p>
+      </div>
+      <div class="site-footer__set site-footer__set--copy" aria-hidden="true">
+        <hr class="site-footer__sep site-footer__sep--lead" />
+        <p class="site-footer__mark"><span class="site-footer__mark-name">Văn Miếu</span><span class="site-footer__mark-dot">·</span><span class="site-footer__mark-note">1070</span></p>
+        <hr class="site-footer__sep" />
+        <p class="site-footer__mark"><span class="site-footer__mark-name">Truyện Kiều</span><span class="site-footer__mark-dot">·</span><span class="site-footer__mark-note">chữ Nôm</span></p>
+        <hr class="site-footer__sep" />
+        <p class="site-footer__mark"><span class="site-footer__mark-name">Quốc ngữ</span><span class="site-footer__mark-dot">·</span><span class="site-footer__mark-note">1651</span></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Credits: filled from src/data/credits.json by core/footer.js -->
+  <dialog class="credits" id="credits-dialog" data-credits aria-labelledby="credits-title" data-lenis-prevent>
+    <div class="credits__frame animated-gradient-border">
+      <div class="credits__surface">
+        <div class="credits__head">
+          <h2 class="t-h5 credits__title" id="credits-title">Nguồn ảnh &amp; giấy phép</h2>
+          <button type="button" class="credits__close" data-credits-close aria-label="Đóng hộp thoại nguồn ảnh">
+            <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+              <path d="M3.5 3.5l9 9M12.5 3.5l-9 9" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" />
+            </svg>
+          </button>
+        </div>
+        <div class="credits__body" data-lenis-prevent>
+          <p class="t-body credits__intro">Mọi ảnh tư liệu trên trang được lấy từ Wikimedia Commons, thuộc phạm vi công cộng hoặc phát hành theo CC0. Các mô hình 3D, hoạ tiết và chuyển động được dựng bằng mã nguồn riêng của dự án.</p>
+
+          <h3 class="t-overline credits__section">Ảnh tư liệu</h3>
+          <ol class="credits__list" data-credits-list></ol>
+
+          <h3 class="t-overline credits__section">Kiểu chữ</h3>
+          <ul class="credits__list">
+            <li class="credits__item">
+              <p class="t-body credits__name">EB Garamond</p>
+              <p class="t-small credits__meta">© 2017 The EB Garamond Project Authors · SIL Open Font License 1.1</p>
+              <p class="t-small credits__links">
+                <a href="https://github.com/octaviopardo/EBGaramond12" target="_blank" rel="noopener noreferrer">Mã nguồn kiểu chữ</a>
+                <a href="fonts/OFL-EBGaramond.txt" target="_blank" rel="noopener">Toàn văn giấy phép</a>
+              </p>
+            </li>
+            <li class="credits__item">
+              <p class="t-body credits__name">Noto Serif TC <span class="credits__muted">(bản rút gọn chỉ gồm các chữ Hán dùng trên trang)</span></p>
+              <p class="t-small credits__meta">© 2012 Google Inc. · SIL Open Font License 1.1</p>
+              <p class="t-small credits__links">
+                <a href="https://fonts.google.com/noto/specimen/Noto+Serif+TC" target="_blank" rel="noopener noreferrer">Trang kiểu chữ</a>
+                <a href="fonts/OFL-NotoSerifTC.txt" target="_blank" rel="noopener">Toàn văn giấy phép</a>
+              </p>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </dialog>
+</footer>

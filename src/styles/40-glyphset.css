@@ -1,0 +1,717 @@
+/* ==========================================================================
+   Bộ ký tự (glyphset) — #1a1a1a section: giant title, glyph grids, sticky
+   weight picker + metric inspector (≥1024) and the glyph sheet (<1024).
+   ========================================================================== */
+
+.glyphset {
+  background: var(--surface-secondary);
+  color: var(--text-heading-invert);
+  scroll-margin-top: var(--header-height);
+  /* current style of the grid glyphs (written by glyphset.js) */
+  --gs-wght: 400;
+  --gs-ital: normal;
+  --gs-han-wght: 400;
+}
+
+/* SplitText line masks (00-base.css .line-mask) pad each line by 0.35em top / 0.5rem bottom and pull it
+   back with negative margins, but adjoining negative margins collapse instead of adding up: every line
+   would gain ~7px and the trimmed ends ~8px. Give each adjoining pair the summed margin on one side so
+   split text keeps exactly the rhythm of the unsplit text. */
+.glyphset .trim > .line-mask:first-child {
+  margin-top: calc(-0.35em + var(--trim-cap, -0.38em));
+}
+.glyphset .trim > .line-mask + .line-mask {
+  margin-top: calc(-0.35em - 0.5rem);
+}
+.glyphset .trim > .line-mask:last-child {
+  margin-bottom: calc(-0.5rem + var(--trim-base, -0.42em));
+}
+
+/* ---------- title + intro ---------- */
+.gs-title {
+  grid-column: 1 / -1;
+}
+.gs-title__svg {
+  width: 100%;
+  height: auto;
+  overflow: hidden; /* letters rise into the svg box */
+}
+.gs-title__svg text {
+  font-family: var(--font-serif);
+  font-size: 1000px; /* = 1000 user units: the viewBox is measured in font units */
+  font-weight: 400;
+  fill: var(--color-white);
+}
+.gs-spacer-md {
+  grid-column: 1 / -1;
+  padding-top: var(--sp-md);
+}
+.gs-intro {
+  grid-column: 1 / -1;
+  color: var(--text-heading-invert);
+}
+@media (min-width: 768px) {
+  .gs-spacer-md {
+    padding-top: 4rem;
+  }
+  .gs-intro {
+    grid-column: 4 / span 3;
+  }
+}
+@media (min-width: 1024px) {
+  .gs-intro {
+    grid-column: 7 / span 6;
+  }
+}
+
+/* ---------- body: groups + aside ---------- */
+.gs-body {
+  align-items: start;
+  row-gap: var(--sp-md);
+}
+.gs-groups {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2xl);
+  padding-top: var(--sp-sm);
+  --cols: 4;
+}
+.gs-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-sm);
+}
+.gs-group__head {
+  display: flex;
+}
+.gs-group__label {
+  --trim-cap: -0.33em;
+  --trim-base: -0.37em;
+  color: var(--color-primary);
+}
+@media (min-width: 1024px) {
+  .gs-groups {
+    grid-column: 1 / span 6;
+  }
+  /* labels alternate sides: 2nd, 4th… group label sits on the right */
+  .gs-group:nth-child(even) .gs-group__head {
+    justify-content: flex-end;
+  }
+}
+
+/* ---------- glyph grid ---------- */
+.gs-grid {
+  position: relative;
+  display: grid;
+  width: 100%;
+  grid-template-columns: repeat(var(--cols), minmax(0, 1fr));
+}
+.gs-grid__lines {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  overflow: visible;
+  pointer-events: none;
+}
+.gs-grid__lines path {
+  fill: none;
+  stroke: var(--border-secondary-invert);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+  shape-rendering: crispEdges;
+}
+.gs-cell {
+  position: relative;
+  display: flex;
+  aspect-ratio: 1;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  color: var(--text-heading-invert);
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.gs-cell__glyph {
+  --trim-cap: -0.23em;
+  --trim-base: -0.27em;
+  position: relative;
+  z-index: 10;
+  white-space: pre;
+  font-weight: var(--gs-wght);
+  font-style: var(--gs-ital);
+  pointer-events: none;
+}
+.gs-grid.is-han .gs-cell__glyph {
+  font-family: var(--font-han);
+  font-weight: var(--gs-han-wght);
+  font-style: normal;
+  font-synthesis: none;
+}
+/* hover frame: fades in under the glyph */
+.gs-cell__hover {
+  position: absolute;
+  inset: 0;
+  z-index: -10;
+  border: 1px solid var(--color-accent);
+  opacity: 0;
+  transition: opacity 300ms var(--ease-out);
+  pointer-events: none;
+}
+@media (hover: hover) {
+  .gs-cell:hover .gs-cell__hover {
+    opacity: 1;
+  }
+}
+/* selected: 1px rotating gradient ring (the conic ::before shows through a 1px gap) */
+.gs-cell__ring {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  animation: gs-ring-in 0.1s var(--ease-out);
+}
+.gs-cell__ring > span {
+  position: absolute;
+  inset: 0;
+  background: var(--color-accent-foreground);
+  clip-path: inset(1px);
+}
+@keyframes gs-ring-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+.gs-cell:focus-visible::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  box-shadow: inset 0 0 0 2px var(--color-secondary);
+  pointer-events: none;
+}
+
+/* ---------- aside ---------- */
+.gs-aside {
+  position: sticky;
+  top: var(--header-height);
+  z-index: 10;
+  order: -1;
+  grid-column: 1 / -1;
+  padding-top: var(--sp-sm);
+  background: rgb(23 23 23 / 0.2);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+}
+.gs-aside__label {
+  display: block;
+  margin-bottom: var(--sp-sm);
+  color: var(--text-heading-invert);
+}
+@media (min-width: 1024px) {
+  .gs-aside {
+    order: 0;
+    grid-column: 7 / span 6;
+    align-self: start;
+  }
+}
+
+.gs-icon {
+  width: var(--sp-sm);
+  height: var(--sp-sm);
+  flex-shrink: 0;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.25;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* mobile: invisible native <select> over a gradient-edged box */
+.gs-select {
+  position: relative;
+  display: block;
+  padding: 1px;
+  border-radius: var(--radius-rounded);
+  background: linear-gradient(to bottom, var(--color-secondary), var(--color-primary));
+}
+.gs-select:has(:focus-visible) {
+  outline: 1px solid var(--color-primary);
+  outline-offset: 2px;
+}
+.gs-select__native {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+  appearance: none;
+  opacity: 0;
+  outline: none;
+  font-size: 1rem; /* ≥16px: no iOS zoom on focus */
+}
+.gs-select__box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--sp-xs) var(--sp-xl) var(--sp-xs) var(--sp-xs);
+  border-radius: calc(var(--radius-rounded) - 1px);
+  background: var(--surface-secondary);
+  color: var(--text-heading-invert);
+}
+.gs-select__chevron {
+  position: absolute;
+  top: 50%;
+  right: var(--sp-xs);
+  transform: translateY(-50%);
+  pointer-events: none;
+  color: var(--text-heading-invert);
+}
+
+/* desktop: custom dropdown */
+.gs-dd {
+  position: relative;
+  display: none;
+  width: 100%;
+}
+.gs-dd__trigger {
+  display: block;
+  width: 100%;
+  border-radius: var(--radius-rounded);
+  color: var(--text-heading-invert);
+  text-align: left;
+}
+.gs-dd__trigger:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+.gs-dd__fill {
+  position: absolute;
+  inset: 1px;
+  z-index: 10;
+  border-radius: 8px;
+  background: var(--color-accent-foreground);
+  transition: all 300ms var(--ease-out-cubic);
+}
+.gs-dd__trigger:hover .gs-dd__fill,
+.gs-dd__trigger:focus-visible .gs-dd__fill {
+  inset: 4px;
+  border-radius: 5px;
+}
+.gs-dd__row {
+  position: relative;
+  z-index: 20;
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--sp-xs);
+  pointer-events: none;
+}
+.gs-dd__chevron {
+  transition: transform 300ms var(--ease-out-cubic);
+}
+.gs-dd__trigger[aria-expanded="true"] .gs-dd__chevron,
+.gs-dd__chevron.is-up {
+  transform: rotate(180deg);
+}
+.gs-dd__panel {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  z-index: 50;
+  width: 100%;
+  border-radius: var(--radius-rounded);
+  visibility: hidden;
+  clip-path: inset(0% 0% 100% 0%);
+}
+/* the inner panel is clipped 4px in: a 4px gradient ring frames the open list */
+.gs-dd__inner {
+  overflow: hidden;
+  border-radius: calc(var(--radius-rounded) - 1px);
+  background: var(--surface-secondary);
+  clip-path: inset(4px round 4px);
+}
+.gs-dd__close {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--sp-xs);
+  color: var(--text-heading-invert);
+}
+.gs-dd__rule {
+  margin-inline: var(--sp-xs);
+  height: 1px;
+  border-bottom: 1px dashed var(--border-dashed-invert);
+}
+.gs-dd__option {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  gap: 1rem;
+  padding: var(--sp-xs) var(--sp-sm) var(--sp-xs) var(--sp-xs);
+  font-family: var(--font-serif);
+  font-size: 1.25rem;
+  line-height: 1.8;
+  text-align: left;
+  color: var(--text-heading-invert);
+}
+.gs-dd__option[aria-selected="true"] {
+  opacity: 0.3;
+}
+.gs-dd__close:focus-visible,
+.gs-dd__option:focus-visible {
+  outline: 2px solid var(--color-secondary);
+  outline-offset: -2px;
+}
+.gs-dd__swipe {
+  height: 0.125rem;
+  flex-grow: 1;
+  transform-origin: left;
+  transform: translateY(2px) scaleX(0);
+  background: linear-gradient(to right, var(--color-secondary), var(--color-primary));
+  transition: transform 400ms var(--ease-out-cubic);
+}
+.gs-dd__option:hover .gs-dd__swipe,
+.gs-dd__option:focus-visible .gs-dd__swipe {
+  transform: translateY(2px) scaleX(1);
+}
+
+/* inspector */
+.gs-inspector {
+  display: none;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1 / 1.1;
+  max-height: calc(100vh - 11rem - var(--header-height));
+  margin-top: var(--sp-sm);
+  padding: 4px;
+  border-radius: var(--radius-rounded);
+}
+.gs-inspector__panel {
+  position: relative;
+  z-index: 10;
+  width: 100%;
+  height: 100%;
+  padding: var(--sp-md);
+  border-radius: calc(var(--radius-rounded) - 4px);
+  background: var(--surface-secondary);
+}
+.gs-inspector__stage {
+  position: absolute;
+  inset: var(--sp-md) var(--sp-md) calc(var(--sp-md) + 1.5rem);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  container-type: size;
+}
+.gs-inspector__square {
+  position: relative;
+  flex-shrink: 0;
+  width: min(100cqw, 100cqh);
+  height: min(100cqw, 100cqh);
+}
+.gs-inspector__svg,
+.gs-modal__svg {
+  overflow: visible;
+}
+.gs-inspector__svg {
+  width: 100%;
+  height: 100%;
+}
+.gs-inspector__svg text,
+.gs-modal__svg text {
+  font-family: var(--font-serif);
+  fill: var(--color-white);
+  white-space: pre;
+}
+.gs-metric {
+  position: absolute;
+  left: 50%;
+  display: flex;
+  width: 100cqw;
+  align-items: center;
+  gap: var(--sp-md);
+  transform: translate(-50%, -50%);
+  mix-blend-mode: difference;
+  color: var(--text-secondary-invert);
+}
+.gs-metric__label {
+  width: 5rem;
+  flex-shrink: 0;
+  transform: translateY(-0.25rem);
+  white-space: nowrap;
+}
+.gs-metric__value {
+  width: 3rem;
+  flex-shrink: 0;
+  transform: translateY(-0.25rem);
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.gs-metric__line {
+  height: 1px;
+  flex: 1;
+  border-top: 1px dashed var(--border-secondary-invert);
+}
+/* "Vùng dấu": our extra guide, in lotus pink */
+.gs-metric.is-accent {
+  color: var(--color-primary);
+}
+.gs-metric.is-accent .gs-metric__line {
+  border-top-color: color-mix(in srgb, var(--color-primary) 70%, transparent);
+}
+@media (max-height: 359px) {
+  .gs-metric {
+    display: none;
+  }
+}
+.gs-inspector__caption {
+  position: absolute;
+  right: var(--sp-md);
+  bottom: var(--sp-xs);
+  left: var(--sp-md);
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  color: var(--text-secondary-invert);
+  white-space: nowrap;
+}
+.gs-inspector__caption-name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--text-heading-invert);
+}
+.gs-inspector__caption-code {
+  margin-left: auto;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+}
+@media (min-width: 1024px) {
+  .gs-dd,
+  .gs-inspector {
+    display: block;
+  }
+  .gs-select {
+    display: none;
+  }
+}
+
+/* ---------- mobile glyph sheet (portal on <body>) ---------- */
+.gs-modal {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-modal);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--sp-sm);
+  padding-top: calc(var(--header-height) + var(--sp-sm));
+  background: rgb(26 26 26 / 0.4);
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+  opacity: 0;
+  transition: opacity 300ms;
+  user-select: none;
+  -webkit-user-select: none;
+  color: var(--text-heading-invert);
+  font-family: var(--font-serif);
+}
+.gs-modal[hidden] {
+  display: none;
+}
+.gs-modal.is-open {
+  opacity: 1;
+}
+.gs-modal:focus {
+  outline: none;
+}
+.gs-modal__backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+.gs-modal__sheet {
+  position: relative;
+  z-index: 10;
+  width: 100%;
+  height: calc(90vh - var(--header-height));
+  padding: 4px;
+  border-radius: var(--radius-rounded);
+  transform: translateY(100%);
+  transition:
+    transform 300ms var(--ease-out),
+    translate 300ms var(--ease-out);
+}
+.gs-modal.is-open .gs-modal__sheet {
+  transform: translateY(0);
+}
+.gs-modal__sheet.is-dragging {
+  transition: none;
+}
+.gs-modal__inner {
+  position: relative;
+  z-index: 10;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  border-radius: calc(var(--radius-rounded) - 4px);
+  background: var(--surface-secondary);
+}
+.gs-modal__close {
+  position: absolute;
+  top: var(--sp-lg);
+  left: 50%;
+  z-index: 20;
+  display: flex;
+  width: var(--sp-sm);
+  height: var(--sp-sm);
+  align-items: center;
+  justify-content: center;
+  transform: translateX(-50%);
+  color: var(--text-heading-invert);
+}
+.gs-modal__close::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  transform: scale(3); /* bigger touch target */
+}
+.gs-modal__close:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 4px;
+  border-radius: 2px;
+}
+.gs-modal__close .gs-icon {
+  width: var(--sp-xs);
+  height: var(--sp-xs);
+  stroke-width: 2.5;
+}
+.gs-modal__stage {
+  position: absolute;
+  inset: 0;
+  container-type: size;
+}
+.gs-modal__viewport {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  touch-action: none;
+}
+.gs-modal__track {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  will-change: transform;
+}
+.gs-modal__slide {
+  position: relative;
+  display: flex;
+  flex: 0 0 100%;
+  min-width: 0;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+}
+.gs-modal__svg {
+  aspect-ratio: 1;
+  height: min(425px, 72cqh, 100cqw);
+  width: auto;
+  max-width: none;
+}
+.gs-modal__lines {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 71%;
+  height: min(425px, 72cqh, 100cqw);
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+.gs-modal__lines > span {
+  position: absolute;
+  inset-inline: 0;
+  border-top: 1px dashed var(--border-secondary-invert);
+}
+.gs-modal__lines > span.is-accent {
+  border-top-color: color-mix(in srgb, var(--color-primary) 70%, transparent);
+}
+.gs-modal__caption {
+  position: absolute;
+  right: var(--sp-xs);
+  bottom: calc(var(--sp-lg) + 12px + var(--sp-sm));
+  left: var(--sp-xs);
+  text-align: center;
+  color: var(--text-secondary-invert);
+}
+.gs-modal__caption-name {
+  color: var(--text-heading-invert);
+}
+.gs-modal__dots {
+  position: absolute;
+  bottom: var(--sp-lg);
+  left: 50%;
+  width: 36px;
+  overflow: hidden;
+  transform: translateX(-50%);
+}
+.gs-modal__dots-track {
+  display: flex;
+  align-items: center;
+}
+.gs-modal__dot {
+  display: flex;
+  flex: 0 0 12px;
+  height: 12px;
+  align-items: center;
+  justify-content: center;
+}
+.gs-modal__dot > span {
+  display: block;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--text-heading-invert);
+  transition:
+    width 300ms var(--ease-out),
+    height 300ms var(--ease-out),
+    transform 300ms var(--ease-out);
+}
+.gs-modal__dot.is-active > span {
+  width: 8px;
+  height: 8px;
+}
+.gs-modal.is-dragging .gs-modal__dot.is-active > span {
+  transform: scale(1.1);
+}
+@media (min-width: 1024px) {
+  .gs-modal {
+    display: none;
+  }
+}
+
+/* ---------- reduced motion ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .gs-cell__ring {
+    animation: none;
+  }
+  .gs-cell__hover,
+  .gs-dd__fill,
+  .gs-dd__chevron,
+  .gs-dd__swipe,
+  .gs-modal,
+  .gs-modal__sheet,
+  .gs-modal__dot > span {
+    transition: none;
+  }
+}

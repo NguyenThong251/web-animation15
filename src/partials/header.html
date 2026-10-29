@@ -1,0 +1,100 @@
+<!-- Fixed header: slides down after the intro reveal (core/header.js adds .is-active),
+     brand wipes in behind a mask, QuickMenu jumps between the five nav anchors. -->
+<header class="site-header" data-header data-variant="immersive">
+  <div class="site-header__inner">
+    <div class="site-header__row">
+      <div class="site-header__brand-mask">
+        <div class="site-header__brand no-ligatures">
+          <span class="t-body t-bold trim trim--body site-header__title">Khuê Văn</span>
+          <span class="t-body t-italic trim trim--body site-header__payoff site-header__payoff--lg">— <b>Hồn chữ Việt</b>, từ bia đá đến Quốc ngữ</span>
+          <span class="t-body t-italic trim trim--body site-header__payoff site-header__payoff--sm"><b>Hồn chữ Việt</b></span>
+        </div>
+      </div>
+
+      <div class="quick-menu" data-quick-menu>
+        <button
+          type="button"
+          class="qm-trigger animated-gradient-border group-clip"
+          data-qm-trigger
+          aria-expanded="false"
+          aria-controls="quick-menu-panel"
+          aria-haspopup="menu"
+          aria-label="Mở menu điều hướng nhanh"
+        >
+          <span class="qm-trigger__row">
+            <span class="qm-trigger__fill" aria-hidden="true"></span>
+            <span class="qm-trigger__content" data-qm-label>
+              <span class="t-small t-bold trim trim--small qm-trigger__index" data-qm-index aria-hidden="true">01</span>
+              <span class="t-menu trim trim--menu qm-trigger__title">
+                <span class="qm-roll" data-qm-roll>
+                  <span class="qm-roll__item"><span class="text-clip"><span data-label="Nền móng">Nền móng</span></span></span>
+                  <span class="qm-roll__item" aria-hidden="true"><span class="text-clip"><span data-label="Nền móng">Nền móng</span></span></span>
+                </span>
+              </span>
+              <svg class="qm-icon qm-icon--plus" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+                <path d="M8 2.5v11M2.5 8h11" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" />
+              </svg>
+            </span>
+          </span>
+        </button>
+
+        <div class="qm-panel animated-gradient-border" id="quick-menu-panel" data-qm-panel aria-hidden="true" inert>
+          <div class="qm-panel__surface">
+            <div class="qm-panel__head" data-motion-item>
+              <span class="t-menu trim trim--menu" data-qm-head-title>Nền móng</span>
+              <button type="button" class="qm-close" data-qm-close tabindex="-1" aria-label="Đóng menu điều hướng nhanh">
+                <svg class="qm-icon" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+                  <path d="M3.5 3.5l9 9M12.5 3.5l-9 9" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" />
+                </svg>
+              </button>
+            </div>
+            <nav class="qm-nav" aria-label="Điều hướng nhanh">
+              <ul role="menu">
+                <li role="none" data-motion-item>
+                  <a role="menuitem" class="qm-item" href="#nav-anchor-nen-mong" data-qm-item="nen-mong" tabindex="-1">
+                    <span class="t-menu trim trim--menu qm-item__title">Nền móng</span>
+                    <span class="qm-item__line" aria-hidden="true"></span>
+                    <span class="t-small t-bold trim trim--small qm-item__num">01</span>
+                  </a>
+                  <div class="qm-item__divider" aria-hidden="true"></div>
+                </li>
+                <li role="none" data-motion-item>
+                  <a role="menuitem" class="qm-item" href="#nav-anchor-khao-cuu" data-qm-item="khao-cuu" tabindex="-1">
+                    <span class="t-menu trim trim--menu qm-item__title">Khảo cứu</span>
+                    <span class="qm-item__line" aria-hidden="true"></span>
+                    <span class="t-small t-bold trim trim--small qm-item__num">02</span>
+                  </a>
+                  <div class="qm-item__divider" aria-hidden="true"></div>
+                </li>
+                <li role="none" data-motion-item>
+                  <a role="menuitem" class="qm-item" href="#nav-anchor-kieu-chu" data-qm-item="kieu-chu" tabindex="-1">
+                    <span class="t-menu trim trim--menu qm-item__title">Kiểu chữ</span>
+                    <span class="qm-item__line" aria-hidden="true"></span>
+                    <span class="t-small t-bold trim trim--small qm-item__num">03</span>
+                  </a>
+                  <div class="qm-item__divider" aria-hidden="true"></div>
+                </li>
+                <li role="none" data-motion-item>
+                  <a role="menuitem" class="qm-item" href="#nav-anchor-bo-ky-tu" data-qm-item="bo-ky-tu" tabindex="-1">
+                    <span class="t-menu trim trim--menu qm-item__title">Bộ ký tự</span>
+                    <span class="qm-item__line" aria-hidden="true"></span>
+                    <span class="t-small t-bold trim trim--small qm-item__num">04</span>
+                  </a>
+                  <div class="qm-item__divider" aria-hidden="true"></div>
+                </li>
+                <li role="none" data-motion-item>
+                  <a role="menuitem" class="qm-item" href="#nav-anchor-tai-ve" data-qm-item="tai-ve" tabindex="-1">
+                    <span class="t-menu trim trim--menu qm-item__title">Tải về</span>
+                    <span class="qm-item__line" aria-hidden="true"></span>
+                    <span class="t-small t-bold trim trim--small qm-item__num">05</span>
+                  </a>
+                  <div class="qm-item__divider" aria-hidden="true"></div>
+                </li>
+              </ul>
+            </nav>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>

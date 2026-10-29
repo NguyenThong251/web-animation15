@@ -1,0 +1,22 @@
+{
+  "name": "khuevan",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Khuê Văn — hồn chữ Việt: an original Vietnamese-writing microsite in the Michelangelus motion style (Vite + Three.js + GSAP + Lenis)",
+  "scripts": {
+    "dev": "vite --port 4400 --host 0.0.0.0",
+    "build": "vite build",
+    "preview": "vite preview --port 4401 --host 0.0.0.0"
+  },
+  "devDependencies": {
+    "vite": "^6.4.5"
+  },
+  "dependencies": {
+    "@fontsource/eb-garamond": "^5.3.0",
+    "gsap": "^3.15.0",
+    "lenis": "^1.3.27",
+    "three": "^0.184.0",
+    "troika-three-text": "^0.52.5"
+  }
+}

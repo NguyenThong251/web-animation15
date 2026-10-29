@@ -1,0 +1,93 @@
+<!-- Kiểu chữ · typeface wheel (700lvh). Four cards ride a wheel across a sticky #f5f5f5 stage;
+     the last one expands into a live type tester. Motion: src/sections/typeface-wheel.js -->
+<section class="tw" id="nav-anchor-kieu-chu" data-nav="kieu-chu" data-typeface-wheel aria-labelledby="tw-title">
+  <div class="tw__sticky">
+    <div class="tw__stage" data-tw-stage>
+      <figure class="tw__card" data-tw-card="0" data-tone="indigo" style="z-index: 40">
+        <canvas class="tw__canvas" data-tw-canvas="marks" aria-hidden="true"></canvas>
+        <figcaption class="sr-only">Dấu thanh: một nguyên âm cỡ lớn, lần lượt nhận năm dấu huyền, sắc, hỏi, ngã, nặng.</figcaption>
+      </figure>
+
+      <figure class="tw__card" data-tw-card="1" data-tone="pink" style="z-index: 30">
+        <canvas class="tw__canvas" data-tw-canvas="years" aria-hidden="true"></canvas>
+        <figcaption class="sr-only">Niên đại: 1070 dựng Văn Miếu, 1076 lập Quốc Tử Giám, 1442 khoa thi đầu tiên được khắc bia, 1484 dựng bia tiến sĩ, 1651 từ điển Việt – Bồ – La, 1865 Gia Định báo, 1919 khoa thi Hội cuối cùng ở Huế.</figcaption>
+      </figure>
+
+      <figure class="tw__card" data-tw-card="2" data-tone="white" style="z-index: 20">
+        <canvas class="tw__canvas" data-tw-canvas="voices" aria-hidden="true"></canvas>
+        <figcaption class="sr-only">Bốn giọng: chữ “Việt” chuyển dần độ đậm từ 400 đến 800, từ chữ đứng sang chữ nghiêng.</figcaption>
+      </figure>
+
+      <figure class="tw__card tw__card--tester" data-tw-card="3" data-tone="black" style="z-index: 10">
+        <canvas class="tw__canvas" data-tw-canvas="tester" aria-hidden="true"></canvas>
+        <figcaption class="sr-only">Thử chữ: gõ một dòng tiếng Việt và xem nó trong bốn kiểu của EB Garamond.</figcaption>
+
+        <div class="tw-tester" data-tw-tester inert>
+          <div class="tw-tester__head">
+            <p class="tw-tester__eyebrow">Thử chữ</p>
+            <fieldset class="tw-seg">
+              <legend class="sr-only">Kiểu chữ</legend>
+              <label class="tw-seg__item">
+                <input type="radio" name="tw-style" value="thuong" checked />
+                <span>Thường</span>
+              </label>
+              <label class="tw-seg__item">
+                <input type="radio" name="tw-style" value="nghieng" />
+                <span class="t-italic">Nghiêng</span>
+              </label>
+              <label class="tw-seg__item">
+                <input type="radio" name="tw-style" value="dam" />
+                <span class="t-bold">Đậm</span>
+              </label>
+              <label class="tw-seg__item">
+                <input type="radio" name="tw-style" value="dam-nghieng" />
+                <span class="t-bold t-italic">Đậm nghiêng</span>
+              </label>
+            </fieldset>
+          </div>
+
+          <div class="tw-tester__sliders">
+            <label class="tw-range">
+              <span class="tw-range__name">Độ đậm</span>
+              <input type="range" min="400" max="800" step="1" value="400" data-tw-wght />
+              <output class="tw-range__value" data-tw-wght-out>400</output>
+            </label>
+            <label class="tw-range">
+              <span class="tw-range__name">Cỡ chữ</span>
+              <input type="range" min="24" max="160" step="1" value="88" data-tw-size />
+              <output class="tw-range__value" data-tw-size-out>88 px</output>
+            </label>
+          </div>
+
+          <div class="tw-tester__stage">
+            <p
+              class="tw-tester__text"
+              data-tw-text
+              contenteditable="true"
+              spellcheck="false"
+              role="textbox"
+              aria-label="Dòng chữ thử, có thể sửa"
+              translate="no"
+            >Trăm năm trong cõi người ta, chữ tài chữ mệnh khéo là ghét nhau.</p>
+          </div>
+
+          <div class="tw-tester__foot">
+            <p class="tw-tester__meta" data-tw-meta>EB Garamond · Thường · 400 — nhấp vào dòng chữ để gõ thử</p>
+            <button type="button" class="tw-tester__reset group-clip" data-tw-reset>
+              <span class="text-clip"><span data-label="Đặt lại">Đặt lại</span></span>
+            </button>
+          </div>
+        </div>
+      </figure>
+    </div>
+
+    <div class="container tw__copy-layer">
+      <div class="grid">
+        <div class="tw__copy" data-tw-copy>
+          <h2 class="t-h4 tw__title" id="tw-title" data-tw-title>Một kiểu chữ, bốn giọng</h2>
+          <p class="t-body tw__text" data-tw-text-copy>EB Garamond là bản phục dựng mã nguồn mở của dòng chữ Garamond thế kỷ XVI, có đủ bộ dấu tiếng Việt. Thường, nghiêng, đậm, đậm nghiêng — đủ cho sách, báo, văn bản và những dòng tiêu đề trang trọng.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

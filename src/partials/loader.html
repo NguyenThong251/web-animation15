@@ -1,0 +1,28 @@
+<!-- Loader: pink border-stroke progress + flip-book letter + spinner (built by core/loader.js).
+     No background of its own — the blue behind it is the WebGL canvas / body. -->
+<div class="loader" data-loader role="status" aria-live="polite">
+  <span class="sr-only" data-loader-status>Đang tải trải nghiệm Khuê Văn…</span>
+
+  <div class="loader__progress" data-loader-progress aria-hidden="true">
+    <svg focusable="false"><path stroke-width="12" vector-effect="non-scaling-stroke" /></svg>
+  </div>
+
+  <!-- 40 stacked glyph frames are injected here -->
+  <div class="loader__char" data-loader-char aria-hidden="true">
+    <span class="loader__flip" data-loader-flip></span>
+  </div>
+
+  <div class="loader__spinner" data-loader-spinner aria-hidden="true">
+    <svg viewBox="25 25 50 50" focusable="false"><circle cx="50" cy="50" r="20" /></svg>
+  </div>
+
+  <!-- shown only when WebGL is unavailable -->
+  <div class="loader__fallback" data-loader-fallback hidden>
+    <div class="loader__fallback-inner">
+      <p class="t-large t-italic loader__fallback-payoff">Hồn chữ Việt, từ bia đá đến Quốc ngữ</p>
+      <p class="loader__fallback-title" aria-hidden="true">Khuê Văn</p>
+      <p class="t-large loader__fallback-text">Trải nghiệm tương tác không khả dụng trên trình duyệt này.</p>
+      <p class="t-small loader__fallback-hint">Bạn vẫn có thể cuộn xuống để đọc toàn bộ nội dung.</p>
+    </div>
+  </div>
+</div>

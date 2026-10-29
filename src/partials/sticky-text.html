@@ -1,0 +1,67 @@
+<!-- Sticky text (Khảo cứu): sticky copy over the 2.5D photo of Khuê Văn Các, four archive tiles
+     drifting past at different speeds (scroll parallax + pointer pan). Motion: core/sticky-text.js -->
+<section class="sticky-text" data-slot="sticky-text" data-sticky-text>
+  <div class="sticky-text__stage" data-motion-stage>
+    <div class="sticky-text__copy" data-motion-copy>
+      <div class="container">
+        <div class="grid sticky-text__grid">
+          <div class="sticky-text__title-col">
+            <h2 class="t-h4 trim trim--h4 sticky-text__title" data-motion-title>Ba lớp chữ trên cùng một tiếng nói</h2>
+          </div>
+          <div class="sticky-text__text-col">
+            <p class="t-large trim trim--body sticky-text__text" data-motion-text>Chữ Hán là văn tự của triều đình và khoa cử. Chữ Nôm mượn, ghép các thành phần của chữ Hán để ghi âm tiếng Việt — thứ chữ đã chở Truyện Kiều của Nguyễn Du. Thế kỷ XVII, các giáo sĩ phương Tây dùng mẫu tự La-tinh ghi lại tiếng Việt; năm 1651, từ điển Việt – Bồ – La của Alexandre de Rhodes được in tại Rome. Phải gần ba thế kỷ sau, chữ Quốc ngữ mới thay chữ Hán – Nôm trở thành chữ viết phổ thông của tiếng Việt.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="container sticky-text__tiles">
+      <div class="sticky-text__tiles-inner">
+        <!-- 1 · portrait-ish slot → Nôm woodblock title page, cropped to its central title column -->
+        <div class="st-tile st-tile--1" data-motion-parallax="0.7" data-motion-parallax-mobile="2">
+          <div class="st-tile__pan" data-motion-tile-pan="13">
+            <div class="st-tile__img-parallax" data-motion-image-parallax="12">
+              <div class="st-tile__img-pan" data-motion-image-pan="8">
+                <img src="images/kim-van-kieu-tan-truyen.webp" width="1000" height="764" loading="lazy" decoding="async"
+                  alt="Trang đầu bản in khắc gỗ Kim Vân Kiều tân truyện — Truyện Kiều của Nguyễn Du in bằng chữ Nôm, nhan đề khắc chữ lớn ở giữa trang" />
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- 2 · ~1.15 slot → two-page Truyện Kiều spread (1.14) -->
+        <div class="st-tile st-tile--2" data-motion-parallax="1.68" data-motion-parallax-mobile="1.5">
+          <div class="st-tile__pan" data-motion-tile-pan="6">
+            <div class="st-tile__img-parallax" data-motion-image-parallax="10">
+              <div class="st-tile__img-pan" data-motion-image-pan="5">
+                <img src="images/truyen-kieu-trang.webp" width="1000" height="876" loading="lazy" decoding="async"
+                  alt="Hai trang sách Truyện Kiều in chữ Nôm, các cột chữ đọc từ trên xuống, từ phải sang trái" />
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- 3 · wide slot (1.5) → 1651 dictionary crop (1.78) -->
+        <div class="st-tile st-tile--3" data-motion-parallax="0.56" data-motion-parallax-mobile="1.3">
+          <div class="st-tile__pan" data-motion-tile-pan="10">
+            <div class="st-tile__img-parallax" data-motion-image-parallax="10">
+              <div class="st-tile__img-pan" data-motion-image-pan="3">
+                <img src="images/tu-dien-1651-dep-long.webp" width="470" height="264" loading="lazy" decoding="async"
+                  alt="Trích Từ điển Việt – Bồ – La của Alexandre de Rhodes, in tại Rome năm 1651: mục từ “đẹp lòng” viết bằng chữ Quốc ngữ thời đầu, kèm lời giải tiếng Bồ Đào Nha và La-tinh" />
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- 4 · tall slot (0.67) → Gia Định báo front page (0.665) -->
+        <div class="st-tile st-tile--4" data-motion-parallax="0.84" data-motion-parallax-mobile="0.8">
+          <div class="st-tile__pan" data-motion-tile-pan="-6">
+            <div class="st-tile__img-parallax" data-motion-image-parallax="5">
+              <div class="st-tile__img-pan" data-motion-image-pan="13">
+                <img src="images/gia-dinh-bao-1866.webp" width="1400" height="2104" loading="lazy" decoding="async"
+                  alt="Trang nhất một số Gia Định báo — tờ báo đầu tiên in bằng chữ Quốc ngữ, ra số đầu năm 1865 tại Sài Gòn" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

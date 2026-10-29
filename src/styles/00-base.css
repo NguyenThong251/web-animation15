@@ -1,0 +1,519 @@
+/* ==========================================================================
+   Khuê Văn — design system (shared by every section)
+   Tokens follow the reference motion site 1:1; content and palette names are ours:
+   hồng sen (lotus pink) #ff9cef · xanh chàm (indigo) #5b74eb
+   ========================================================================== */
+
+@font-face {
+  font-family: "EB Garamond";
+  src: url("/fonts/EBGaramond-VF.woff2") format("woff2");
+  font-weight: 400 800;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "EB Garamond";
+  src: url("/fonts/EBGaramond-Italic-VF.woff2") format("woff2");
+  font-weight: 400 800;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Noto Serif TC Han";
+  src: url("/fonts/NotoSerifTC-Han-400.woff2") format("woff2");
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Noto Serif TC Han";
+  src: url("/fonts/NotoSerifTC-Han-700.woff2") format("woff2");
+  font-weight: 700;
+  font-display: swap;
+}
+/* metric-matched fallback so the swap doesn't shift layout */
+@font-face {
+  font-family: "EB Garamond Fallback";
+  src: local("Georgia"), local("Times New Roman");
+  size-adjust: 92%;
+  ascent-override: 109%;
+  descent-override: 32%;
+}
+
+:root {
+  --color-primary: #ff9cef; /* hồng sen */
+  --color-secondary: #5b74eb; /* xanh chàm */
+  --color-accent: #f5f5f5;
+  --color-accent-foreground: #171717;
+  --color-frame: #edede9;
+  --color-white: #fff;
+  --color-black: #000;
+  --surface-primary: #000;
+  --surface-primary-invert: #fff;
+  --surface-secondary: #1a1a1a;
+  --text-heading: #000;
+  --text-heading-invert: #fff;
+  --text-primary: #333;
+  --text-primary-invert: #ccc;
+  --text-secondary: #4d4d4d;
+  --text-secondary-invert: #b2b2b2;
+  --border-primary: #000;
+  --border-secondary: #0000004d;
+  --border-secondary-invert: #ffffff4d;
+  --border-dashed: #00000080;
+  --border-dashed-invert: #ffffff80;
+
+  --font-serif: "EB Garamond", "EB Garamond Fallback", Georgia, serif;
+  --font-han: "Noto Serif TC Han", "Noto Serif TC", "Songti TC", serif;
+
+  --px: 0.0625rem;
+  --gutter: calc(10 * var(--px));
+  --margin: calc(16 * var(--px));
+  --offset: calc(16 * var(--px));
+  --header-height: calc(46 * var(--px));
+
+  --sp-3xs: 0.25rem;
+  --sp-2xs: 0.5rem;
+  --sp-xs: 1rem;
+  --sp-sm: 1.5rem;
+  --sp-md: 2rem;
+  --sp-lg: 2.5rem;
+  --sp-xl: 3.5rem;
+  --sp-2xl: 5rem;
+  --sp-3xl: 7rem;
+  --pad-sm: 1rem;
+  --pad-md: 2.5rem;
+  --pad-lg: 6rem;
+  --spacer-2xl: 3.5rem;
+
+  --radius-minimal: 0.25rem;
+  --radius-rounded: 0.5rem;
+
+  --ease-out-cubic: cubic-bezier(0.215, 0.61, 0.355, 1);
+  --ease-in-out-cubic: cubic-bezier(0.645, 0.045, 0.355, 1);
+  --ease-out: cubic-bezier(0, 0, 0.2, 1);
+
+  --z-canvas: 0;
+  --z-section: 10;
+  --z-modal: 50;
+  --z-follower: 95;
+  --z-header: 96;
+  --z-scrollbar: 97;
+  --z-loader: 99;
+}
+@media (min-width: 768px) {
+  :root {
+    --gutter: calc(20 * var(--px));
+    --margin: calc(30 * var(--px));
+    --offset: calc(30 * var(--px));
+    --header-height: calc(75 * var(--px));
+    --spacer-2xl: 7rem;
+  }
+}
+@media (min-width: 1024px) {
+  :root {
+    --margin: calc(60 * var(--px));
+    --offset: calc(60 * var(--px));
+  }
+}
+@media (min-width: 1280px) {
+  :root {
+    --gutter: calc(30 * var(--px));
+    --margin: calc(100 * var(--px));
+    --offset: calc(80 * var(--px));
+  }
+}
+
+/* ---------- reset / page ---------- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+html {
+  font-size: 16px;
+  scroll-behavior: auto;
+  -webkit-text-size-adjust: 100%;
+  font-variant-ligatures: common-ligatures;
+  font-feature-settings: "liga" 1, "clig" 1;
+}
+@media (min-width: 1440px) {
+  html {
+    font-size: max(16px, 1vw);
+  }
+}
+body {
+  margin: 0;
+  background: var(--color-secondary);
+  color: var(--text-primary);
+  font-family: var(--font-serif);
+  font-size: 1rem;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  cursor: default;
+}
+img,
+video,
+canvas,
+svg {
+  display: block;
+  max-width: 100%;
+}
+button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+}
+a {
+  color: inherit;
+  text-decoration: none;
+}
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+ul,
+figure {
+  margin: 0;
+  padding: 0;
+  font-weight: inherit;
+}
+ul {
+  list-style: none;
+}
+hr {
+  border: 0;
+  margin: 0;
+}
+::selection {
+  background: var(--color-primary);
+  color: var(--color-accent-foreground);
+}
+.han {
+  font-family: var(--font-han);
+}
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+.skip-link {
+  position: fixed;
+  top: 0.5rem;
+  left: 0.5rem;
+  z-index: 100;
+  padding: 0.5rem 1rem;
+  background: #fff;
+  color: #000;
+  transform: translateY(-200%);
+}
+.skip-link:focus {
+  transform: none;
+}
+
+/* ---------- Lenis ---------- */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+.lenis.lenis-stopped {
+  overflow: clip;
+}
+.lenis.lenis-smooth iframe {
+  pointer-events: none;
+}
+@media (hover: hover) and (pointer: fine) {
+  html {
+    scrollbar-width: none;
+  }
+  html::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* ---------- WebGL canvas layer ---------- */
+#webgl {
+  position: fixed;
+  inset: 0 auto auto 0;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: var(--z-canvas);
+}
+#webgl canvas {
+  width: 100% !important;
+  height: 100% !important;
+}
+main {
+  position: relative;
+}
+[data-scene-scroll-root] > *,
+.section {
+  position: relative;
+  z-index: var(--z-section);
+}
+
+/* ---------- layout ---------- */
+.container {
+  width: 100%;
+  max-width: 100%;
+  margin-inline: auto;
+  padding-inline: var(--margin);
+}
+.grid {
+  display: grid;
+  width: 100%;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: var(--gutter);
+}
+@media (min-width: 768px) {
+  .grid {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+}
+@media (min-width: 1024px) {
+  .grid {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+  }
+}
+.spacer-2xl {
+  padding-top: var(--spacer-2xl);
+}
+
+/* ---------- typography (modular scale ×1.25; s = <768, d = ≥768) ---------- */
+.t-huge,
+.t-h1,
+.t-h2,
+.t-h3,
+.t-h4,
+.t-h5,
+.t-h6,
+.t-large,
+.t-body,
+.t-menu,
+.t-small,
+.t-caption,
+.t-overline,
+.t-glyph {
+  font-family: var(--font-serif);
+  font-weight: 400;
+}
+.t-huge {
+  font-size: 3.815rem;
+  line-height: 1.4;
+}
+.t-h1 {
+  font-size: 3.815rem;
+  line-height: 1.4;
+}
+.t-h2 {
+  font-size: 3.052rem;
+  line-height: 1.2;
+}
+.t-h3 {
+  font-size: 2.441rem;
+  line-height: 1.1;
+}
+.t-h4 {
+  font-size: 1.953rem;
+  line-height: 1.2;
+  letter-spacing: -0.625px;
+}
+.t-h5 {
+  font-size: 1.5625rem;
+  line-height: 1.2;
+}
+.t-h6 {
+  font-size: 1.25rem;
+  line-height: 1.8;
+}
+.t-large {
+  font-size: 1.25rem;
+  line-height: 1.5;
+}
+.t-body {
+  font-size: 1rem;
+  line-height: 1.5;
+}
+.t-menu {
+  font-size: 1.125rem;
+  line-height: 1.2;
+  letter-spacing: 0.36px;
+}
+.t-small {
+  font-size: 0.8rem;
+  line-height: 1.4;
+}
+.t-caption {
+  font-size: 0.64rem;
+  line-height: 1.7;
+}
+.t-overline {
+  font-size: 0.512rem;
+  line-height: 1.6;
+  text-transform: uppercase;
+}
+.t-glyph {
+  font-size: 1.5rem;
+  line-height: 1.2;
+}
+@media (min-width: 768px) {
+  .t-huge {
+    font-size: 8.221rem;
+    line-height: 1.2;
+  }
+  .t-h1 {
+    font-size: 4.768rem;
+    line-height: 1.2;
+  }
+  .t-h2 {
+    font-size: 3.815rem;
+    line-height: 1.4;
+  }
+  .t-h3 {
+    font-size: 3.052rem;
+    line-height: 1.1;
+    letter-spacing: -1.4649px;
+  }
+  .t-h4 {
+    font-size: 2.441rem;
+    line-height: 1.2;
+    letter-spacing: -0.7812px;
+  }
+  .t-h5 {
+    font-size: 1.953rem;
+  }
+  .t-h6 {
+    font-size: 1.5625rem;
+    line-height: 1.2;
+  }
+}
+.t-italic,
+em {
+  font-style: italic;
+}
+.t-bold,
+b,
+strong {
+  font-weight: 700;
+}
+.c-accent {
+  color: var(--color-primary);
+}
+.c-invert {
+  color: var(--text-heading-invert);
+}
+.no-ligatures {
+  font-variant-ligatures: none;
+  font-feature-settings: "liga" 0, "clig" 0, "dlig" 0;
+}
+
+/* Capsize-style trimming: text boxes start at cap height, end at baseline.
+   Vietnamese stacked marks rise above the cap height, so trimming stays opt-in (.trim). */
+.trim::before,
+.trim::after {
+  content: "";
+  display: table;
+}
+.trim::before {
+  margin-bottom: var(--trim-cap, -0.38em);
+}
+.trim::after {
+  margin-top: var(--trim-base, -0.42em);
+}
+
+/* SplitText line masks (descender + Vietnamese diacritic room inside the mask) */
+.line-mask {
+  margin-bottom: -0.5rem;
+  padding-bottom: 0.5rem;
+  margin-top: -0.35em;
+  padding-top: 0.35em;
+}
+/* adjoining negative margins collapse (only the larger applies), so the next mask carries the sum */
+.line-mask + .line-mask {
+  margin-top: calc(-0.35em - 0.5rem);
+}
+
+/* ---------- signature UI: rotating conic gradient ring ---------- */
+.animated-gradient-border {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+}
+.animated-gradient-border::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: -1;
+  width: 250%;
+  aspect-ratio: 1;
+  background: conic-gradient(
+    from 0deg,
+    var(--color-secondary) 0%,
+    var(--color-primary) 33.33%,
+    #fff 50%,
+    var(--color-primary) 66.66%,
+    var(--color-secondary) 100%
+  );
+  animation: gradient-border-rotate 3s linear infinite;
+  will-change: transform;
+}
+@keyframes gradient-border-rotate {
+  0% {
+    transform: translate(-50%, -50%) rotate(0);
+  }
+  to {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .animated-gradient-border::before {
+    animation: none;
+    transform: translate(-50%, -50%);
+  }
+}
+
+/* ---------- TextClip: label rolls up, duplicate rolls in (hover/focus on .group-clip) ---------- */
+.text-clip {
+  display: inline-block;
+  overflow: clip;
+  vertical-align: top;
+}
+.text-clip > span {
+  position: relative;
+  display: inline-block;
+  transition: transform 300ms var(--ease-out-cubic);
+}
+.text-clip > span::after {
+  content: attr(data-label);
+  position: absolute;
+  inset: 0;
+  transform: translateY(100%);
+}
+.group-clip:hover .text-clip > span,
+.group-clip:focus-visible .text-clip > span {
+  transform: translateY(-100%);
+}
+
+/* stroke (outline) text used by the loader flip-book */
+.stroke-text {
+  -webkit-text-stroke: 1.6px var(--color-primary);
+  color: color-mix(in srgb, var(--color-primary) 40%, transparent);
+}

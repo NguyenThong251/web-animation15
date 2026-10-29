@@ -1,0 +1,931 @@
+/* ==========================================================================
+   Poster deck — "KHU [Ê] VĂN" (SPEC_MOTION §4.7, sticky cards gallery)
+   ≥768  1100svh pink section, sticky stage: scattered collage → vertical deck.
+         JS writes --root-progress / --slice-progress / --local-progress on the
+         stage, --parallax-progress on the words, --sequence-order/-abs + the
+         -active/-next/-previous/-far classes on the cards; CSS does the motion.
+   <768  100svh pink section with a pointer-drag carousel and scaled dots.
+   Posters are pure HTML/CSS/SVG sized in container units (cqw of the poster
+   width), so they re-rasterise crisply at every scale the deck applies.
+   ========================================================================== */
+
+.deck {
+  /* film grain tiles for the printed look (dark specks / light specks) */
+  --pd-grain-dark: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .7 -.12'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  --pd-grain-light: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .55 -.1'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+
+  position: relative;
+  z-index: var(--z-section);
+  min-height: 100svh;
+  background: var(--color-primary);
+  overflow-x: clip;
+}
+
+/* ---------- sticky stage (desktop) ---------- */
+.deck__stage {
+  --root-progress: 1; /* 1 → 0 while the section enters the viewport */
+  --slice-progress: 0; /* 0 → 1 during the first pinned screen */
+  --local-progress: 0; /* 0 → 1 inside each deck step (image drift) */
+  position: sticky;
+  top: 0;
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  align-items: center;
+  column-gap: var(--sp-xs);
+  width: 100%;
+  height: 100svh;
+  padding-top: var(--header-height);
+  overflow: hidden;
+  perspective: 800px;
+}
+
+/* giant words: 60svh white caps, each in its own clipped half */
+.deck__words {
+  --parallax-progress: 0;
+  position: absolute;
+  inset: 0;
+  translate: 0 calc(10vh * var(--root-progress));
+  pointer-events: none;
+}
+.deck__half {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  overflow: hidden;
+}
+.deck__half--left {
+  left: 0;
+  right: 50%;
+}
+.deck__half--right {
+  left: 50%;
+  right: 0;
+}
+.deck__word {
+  position: absolute;
+  top: 50%;
+  padding-top: var(--header-height);
+  font-family: var(--font-serif);
+  font-size: 60svh;
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--color-white);
+  text-transform: uppercase;
+  white-space: nowrap;
+  font-variant-ligatures: none;
+  font-feature-settings: "liga" 0, "dlig" 0;
+  user-select: none;
+  will-change: translate;
+}
+/* p=0: tucked behind the centre seam · p=1: slid 30vh away from it */
+.deck__word--left {
+  right: 0;
+  translate: calc(-30vh + (30vh + 100%) * (1 - var(--parallax-progress))) -50%;
+}
+.deck__word--right {
+  left: 0;
+  translate: calc(30vh - (30vh + 100%) * (1 - var(--parallax-progress))) -50%;
+}
+
+/* the carousel wrappers vanish on desktop so every card shares the stage's grid cell */
+.deck__viewport,
+.deck__track {
+  display: contents;
+}
+
+.deck__card {
+  --sequence-order: 0;
+  --sequence-abs: 0;
+  position: relative;
+  grid-column: 1 / -1;
+  grid-row: 1;
+  justify-self: center;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  max-width: 50vh;
+  height: 100%;
+  margin: auto;
+  /* collage: spread horizontally at half size */
+  transform: translate3d(var(--sequence-base-x), 0, 0) scale(0.5);
+  translate: 0 0;
+  scale: 1;
+  transition:
+    transform 900ms var(--ease-out-cubic),
+    translate 900ms var(--ease-out-cubic),
+    scale 900ms var(--ease-out-cubic);
+}
+.deck__card.-active {
+  z-index: 30;
+}
+.deck__card.-next {
+  z-index: 20;
+}
+.deck__card.-previous {
+  z-index: 10;
+}
+.deck__card.-far {
+  z-index: 0;
+}
+/* deck: active centred at 1, ±1 step 6vh / 0.875, ±2 steps 12vh / 0.75 */
+.deck__stage.-sequence-cards .deck__card {
+  transform: translateZ(0) scale(1);
+  translate: 0 calc(var(--sequence-order) * 6vh);
+  scale: calc(1 - var(--sequence-abs) / 8);
+}
+
+.deck__lift {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  container-type: inline-size;
+  /* collage offsets: base + root·(entry) − slice·(first pinned screen), per-card scale */
+  translate: 0 calc((var(--intro-base) + var(--intro-root) * var(--root-progress)) - var(--intro-slice) * var(--slice-progress));
+  scale: var(--intro-scale);
+  transition:
+    transform 300ms var(--ease-out-cubic),
+    translate 300ms var(--ease-out-cubic),
+    scale 300ms var(--ease-out-cubic);
+}
+.deck__stage.-sequence-cards .deck__lift {
+  translate: 0 calc(3vh - var(--local-progress) * 6vh);
+  scale: 1;
+}
+
+/* scroll length: 100svh stage + 100 + 100 + 800 = 1100svh */
+.deck__trigger--intro,
+.deck__trigger--sequence {
+  height: 100svh;
+}
+.deck__trigger--carousel {
+  height: 800svh;
+}
+
+.deck__dots {
+  display: none;
+}
+
+/* ---------- mobile carousel (<768) ---------- */
+@media (max-width: 767px) {
+  .deck {
+    display: grid;
+    align-items: center;
+    height: 100svh;
+  }
+  .deck__stage {
+    position: relative;
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: var(--sp-sm);
+    height: auto;
+    padding-top: 0;
+    overflow: visible;
+    perspective: none;
+  }
+  .deck__words,
+  .deck__trigger {
+    display: none;
+  }
+  .deck__viewport {
+    display: block;
+    grid-column: 1;
+    overflow: hidden;
+    padding-inline: var(--margin);
+    touch-action: pan-y pinch-zoom;
+    cursor: grab;
+    outline: none;
+  }
+  .deck__viewport:focus-visible {
+    outline: 2px solid var(--color-white);
+    outline-offset: -2px;
+  }
+  .deck__viewport.is-dragging {
+    cursor: grabbing;
+  }
+  .deck__track {
+    display: flex;
+    margin-left: calc(-1 * var(--margin));
+    user-select: none;
+    -webkit-user-select: none;
+    will-change: transform;
+  }
+  .deck__card {
+    flex: 0 0 100%;
+    grid-column: auto;
+    grid-row: auto;
+    min-width: 0;
+    max-width: none;
+    height: auto;
+    margin: 0;
+    padding-left: var(--margin);
+    transform: none;
+    translate: none;
+    scale: none;
+    transition: none;
+  }
+  .deck__stage.-sequence-cards .deck__card,
+  .deck__stage.-sequence-cards .deck__lift,
+  .deck__lift {
+    transform: none;
+    translate: none;
+    scale: none;
+    transition: none;
+  }
+  .deck__dots {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+  }
+  .deck__dot {
+    position: relative;
+    left: calc(var(--dots-shift, 24) * var(--px));
+    width: calc(8 * var(--px));
+    height: calc(8 * var(--px));
+    margin-inline: calc(4 * var(--px));
+    border-radius: 50%;
+    background: var(--surface-primary-invert);
+    scale: var(--dot-scale, 0);
+    transition: all 300ms var(--ease-out-cubic);
+  }
+  .deck__dots .deck__dot:first-child {
+    --dot-scale: 1;
+  }
+  .deck__dots .deck__dot:nth-child(2) {
+    --dot-scale: 0.6;
+  }
+  .deck__dots .deck__dot:nth-child(3) {
+    --dot-scale: 0.3;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .deck__card,
+  .deck__lift,
+  .deck__dot {
+    transition: none;
+  }
+  .deck__word {
+    will-change: auto;
+  }
+}
+
+/* ==========================================================================
+   Posters — shared frame. 1cqw = 1% of the poster width (poster is 4:5, so
+   its height is 125cqw).
+   ========================================================================== */
+.pd-poster {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-radius: var(--radius-rounded);
+  font-family: var(--font-serif);
+  font-weight: 400;
+  line-height: 1.2;
+  isolation: isolate;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.pd-poster img {
+  -webkit-user-drag: none;
+}
+.pd-poster p,
+.pd-poster ul {
+  margin: 0;
+}
+/* paper grain over every poster */
+.pd-poster::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  pointer-events: none;
+  background-image: var(--pd-grain-dark);
+  background-size: 180px 180px;
+  mix-blend-mode: multiply;
+  opacity: 0.35;
+}
+
+/* ---------- 1 · HÀ NỘI — city magazine cover ---------- */
+.pd-hanoi {
+  background: #1d2266;
+  color: #fff4fb;
+}
+.pd-hanoi::after {
+  background-image: var(--pd-grain-light);
+  mix-blend-mode: soft-light;
+  opacity: 0.55;
+}
+/* duotone: grey photo × hồng sen, then "lighten" with deep chàm (shadows → indigo, highlights → pink) */
+.pd-hanoi__photo {
+  position: absolute;
+  inset: 0;
+  isolation: isolate;
+  background: #ff9cef;
+}
+.pd-hanoi__photo img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  object-fit: cover;
+  object-position: 26% 50%;
+  filter: grayscale(1) contrast(1.6) brightness(1.2);
+  mix-blend-mode: multiply;
+}
+.pd-hanoi__photo::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: #2a2f8f;
+  mix-blend-mode: lighten;
+}
+.pd-hanoi__shade {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgb(24 26 92 / 0.62) 0%,
+    rgb(24 26 92 / 0.28) 20%,
+    rgb(24 26 92 / 0) 34%,
+    rgb(24 26 92 / 0) 54%,
+    rgb(24 26 92 / 0.42) 72%,
+    rgb(20 22 80 / 0.86) 100%
+  );
+}
+.pd-hanoi__top {
+  position: absolute;
+  top: 4.4cqw;
+  left: 5cqw;
+  right: 5cqw;
+  display: flex;
+  justify-content: space-between;
+  font-size: 2.35cqw;
+  line-height: 1.3;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  font-variant-numeric: lining-nums;
+}
+.pd-hanoi__mast {
+  position: absolute;
+  top: 7.6cqw;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-size: 25.4cqw;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: -0.015em;
+  text-transform: uppercase;
+  color: #fff4fb;
+  text-shadow: 0 0 4cqw rgb(24 26 92 / 0.35);
+  font-variant-ligatures: none;
+}
+.pd-hanoi__rubric {
+  position: absolute;
+  top: 34cqw;
+  left: 5cqw;
+  right: 5cqw;
+  display: flex;
+  align-items: center;
+  gap: 2.2cqw;
+  font-size: 2.15cqw;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: #fff4fb;
+  text-shadow: 0 0 1.6cqw rgb(24 26 92 / 0.55);
+}
+.pd-hanoi__rubric i {
+  flex: 1;
+  height: 1px;
+  background: currentColor;
+  opacity: 0.55;
+}
+.pd-hanoi__lines {
+  position: absolute;
+  top: 46cqw;
+  right: 5cqw;
+  display: grid;
+  gap: 3.4cqw;
+  width: 26cqw;
+  text-align: right;
+  font-size: 2.6cqw;
+  line-height: 1.25;
+  list-style: none;
+  text-shadow: 0 0 2cqw rgb(18 20 66 / 0.45);
+}
+.pd-hanoi__lines li {
+  padding-top: 1.8cqw;
+  border-top: 1px solid rgb(255 244 251 / 0.5);
+}
+.pd-hanoi__lines em {
+  display: block;
+  font-size: 4.6cqw;
+  line-height: 1.1;
+  color: #ffd0f6;
+}
+.pd-hanoi__feature {
+  position: absolute;
+  left: 5cqw;
+  right: 5cqw;
+  bottom: 13.5cqw;
+}
+.pd-hanoi__kicker {
+  display: inline-block;
+  padding: 0.7cqw 1.4cqw 0.6cqw 1.5cqw;
+  background: #2a2f8f;
+  font-size: 2.2cqw;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #ffd3f6;
+}
+.pd-hanoi__headline {
+  margin-top: 2cqw !important;
+  font-size: 13cqw;
+  font-style: italic;
+  font-weight: 400;
+  line-height: 0.98;
+  letter-spacing: -0.01em;
+}
+.pd-hanoi__foot {
+  position: absolute;
+  left: 5cqw;
+  right: 5cqw;
+  bottom: 4.6cqw;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 4cqw;
+  font-size: 2.15cqw;
+  font-style: italic;
+  line-height: 1.3;
+  color: #f4dcf0;
+}
+/* tiny printed barcode: a white label with irregular bars + issue number */
+.pd-hanoi__barcode {
+  display: flex;
+  align-items: flex-end;
+  gap: 1cqw;
+  padding: 1cqw 1.2cqw 0.8cqw;
+  background: #fff;
+  border-radius: 0.4cqw;
+  color: #111;
+  font-style: normal;
+}
+.pd-hanoi__barcode i {
+  width: 11cqw;
+  height: 5cqw;
+  background: linear-gradient(
+    90deg,
+    #111 0 4%,
+    transparent 4% 7%,
+    #111 7% 9%,
+    transparent 9% 13%,
+    #111 13% 18%,
+    transparent 18% 20%,
+    #111 20% 22%,
+    transparent 22% 27%,
+    #111 27% 29%,
+    transparent 29% 31%,
+    #111 31% 36%,
+    transparent 36% 40%,
+    #111 40% 42%,
+    transparent 42% 45%,
+    #111 45% 50%,
+    transparent 50% 52%,
+    #111 52% 54%,
+    transparent 54% 58%,
+    #111 58% 63%,
+    transparent 63% 65%,
+    #111 65% 67%,
+    transparent 67% 71%,
+    #111 71% 73%,
+    transparent 73% 76%,
+    #111 76% 81%,
+    transparent 81% 84%,
+    #111 84% 86%,
+    transparent 86% 89%,
+    #111 89% 93%,
+    transparent 93% 96%,
+    #111 96% 100%
+  );
+}
+.pd-hanoi__barcode b {
+  font-size: 2.4cqw;
+  font-weight: 600;
+  line-height: 1;
+  font-variant-numeric: lining-nums;
+}
+
+/* ---------- 2 · Truyện Kiều — book cover ---------- */
+.pd-kieu {
+  --kieu-ink: #2a110b;
+  --kieu-cream: #fbead6;
+  background:
+    radial-gradient(120% 90% at 50% 40%, rgb(255 255 255 / 0.08), transparent 60%),
+    #e4572e;
+  color: var(--kieu-ink);
+}
+.pd-kieu::after {
+  opacity: 0.42;
+}
+.pd-kieu__head {
+  position: absolute;
+  top: 6cqw;
+  left: 0;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6cqw;
+}
+.pd-kieu__author {
+  padding-left: 0.34em; /* optically re-centre the tracked caps */
+  font-size: 3.1cqw;
+  font-weight: 600;
+  letter-spacing: 0.34em;
+  text-transform: uppercase;
+}
+.pd-kieu__dates {
+  font-size: 2.4cqw;
+  font-style: italic;
+  font-variant-numeric: oldstyle-nums;
+}
+.pd-kieu__title {
+  position: absolute;
+  top: 14.5cqw;
+  left: 0;
+  right: 0;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  font-variant-ligatures: none;
+}
+.pd-kieu__title-small {
+  font-size: 6.6cqw;
+  font-style: italic;
+  line-height: 1;
+}
+.pd-kieu__title-big {
+  margin-top: -1.5cqw;
+  font-size: 30cqw;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+/* cream mat holding the woodblock title page; the print multiplies into the paper */
+.pd-kieu__plate {
+  position: absolute;
+  top: 45cqw;
+  left: 50%;
+  width: 66cqw;
+  padding: 2cqw;
+  translate: -50% 0;
+  background: var(--kieu-cream);
+  box-shadow: 0 1.4cqw 3cqw rgb(80 20 6 / 0.28);
+}
+.pd-kieu__print {
+  position: relative;
+  aspect-ratio: 1000 / 764;
+  border: 1px solid rgb(42 17 11 / 0.55);
+  isolation: isolate;
+  overflow: hidden;
+}
+.pd-kieu__print img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: grayscale(1) sepia(0.25) contrast(1.3) brightness(1.1);
+  mix-blend-mode: multiply;
+}
+/* seal 斷腸新聲 (Đoạn trường tân thanh), read right column first */
+.pd-kieu__seal {
+  position: absolute;
+  right: -3.6cqw;
+  bottom: -4.2cqw;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.3cqw;
+  padding: 1cqw;
+  background: #b8301b;
+  color: var(--kieu-cream);
+  font-family: var(--font-han);
+  font-size: 3.5cqw;
+  font-weight: 700;
+  line-height: 1;
+  box-shadow: inset 0 0 0 0.45cqw #b8301b, inset 0 0 0 0.7cqw rgb(251 234 214 / 0.85);
+  rotate: -3deg;
+}
+.pd-kieu__seal span {
+  display: grid;
+  place-items: center;
+  width: 4.2cqw;
+  height: 4.2cqw;
+}
+.pd-kieu__verse {
+  position: absolute;
+  top: 100cqw;
+  left: 6cqw;
+  right: 6cqw;
+  text-align: center;
+  font-size: 3.7cqw;
+  font-style: italic;
+  line-height: 1.42;
+  color: var(--kieu-cream);
+}
+.pd-kieu__foot {
+  position: absolute;
+  left: 6cqw;
+  right: 6cqw;
+  bottom: 4.6cqw;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 2.2cqw;
+  letter-spacing: 0.06em;
+  font-variant-numeric: lining-nums;
+}
+.pd-kieu__mark {
+  width: 2.2cqw;
+  height: 2.2cqw;
+  background: var(--kieu-ink);
+  rotate: 45deg;
+}
+
+/* ---------- 3 · Hương Sen N°.07 — lotus-tea poster ---------- */
+.pd-sen {
+  --sen-ink: #6e2843;
+  --sen-line: #9b4d6b;
+  background:
+    radial-gradient(64% 40% at 50% 54%, rgb(255 250 248 / 0.95), rgb(255 250 248 / 0) 72%),
+    linear-gradient(172deg, #fbe8ec 0%, #f7d5dd 52%, #eebccb 100%);
+  color: var(--sen-ink);
+  text-align: center;
+}
+.pd-sen::after {
+  opacity: 0.22;
+}
+.pd-sen__frame {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  fill: none;
+  stroke: var(--sen-line);
+}
+.pd-sen__line {
+  stroke-width: 1.1;
+}
+.pd-sen__line--fine {
+  stroke-width: 0.55;
+}
+.pd-sen__orn {
+  fill: var(--sen-line);
+  stroke: none;
+}
+.pd-sen__eyebrow {
+  position: absolute;
+  top: 11.2cqw;
+  left: 0;
+  right: 0;
+  padding-left: 0.32em;
+  font-size: 2.3cqw;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+}
+.pd-sen__title {
+  position: absolute;
+  top: 15.4cqw;
+  left: 0;
+  right: 0;
+  font-size: 14.5cqw;
+  font-style: italic;
+  font-weight: 400;
+  line-height: 1.05;
+  letter-spacing: -0.01em;
+  font-feature-settings: "swsh" 1;
+}
+.pd-sen__no {
+  position: absolute;
+  top: 32.6cqw;
+  left: 0;
+  right: 0;
+  font-size: 3.6cqw;
+  letter-spacing: 0.14em;
+  font-variant-numeric: lining-nums;
+}
+.pd-sen__no span {
+  display: inline-block;
+  margin-inline: 1.2cqw;
+  opacity: 0.6;
+}
+.pd-sen__lotus {
+  position: absolute;
+  top: 39.5cqw;
+  left: 50%;
+  width: 66cqw;
+  height: 59.4cqw; /* viewBox 200×180 */
+  max-width: none;
+  translate: -50% 0;
+  overflow: visible;
+}
+.pd-sen__petals use {
+  stroke: var(--sen-ink);
+  stroke-width: 0.7;
+  stroke-linejoin: round;
+}
+.pd-sen__petal {
+  stroke: var(--sen-ink);
+  stroke-width: 0.7;
+}
+.pd-sen__rib {
+  fill: none;
+  stroke: var(--sen-ink);
+  stroke-width: 0.35;
+  stroke-linecap: round;
+  opacity: 0.55;
+}
+.pd-sen__stem {
+  fill: none;
+  stroke: var(--sen-ink);
+  stroke-width: 1;
+  stroke-linecap: round;
+}
+.pd-sen__stem--fine {
+  stroke-width: 0.6;
+}
+.pd-sen__leaf ellipse {
+  stroke: var(--sen-ink);
+  stroke-width: 0.7;
+}
+.pd-sen__calyx {
+  fill: #f7c9d6;
+  stroke: var(--sen-ink);
+  stroke-width: 0.6;
+}
+.pd-sen__line-copy {
+  position: absolute;
+  top: 101.5cqw;
+  left: 8cqw;
+  right: 8cqw;
+  font-size: 4.5cqw;
+  font-style: italic;
+  line-height: 1.25;
+}
+.pd-sen__small {
+  position: absolute;
+  top: 111cqw;
+  left: 8cqw;
+  right: 8cqw;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.8cqw;
+  font-size: 1.8cqw;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  opacity: 0.85;
+}
+.pd-sen__small i {
+  width: 1cqw;
+  height: 1cqw;
+  background: currentColor;
+  rotate: 45deg;
+}
+
+/* ---------- 4 · Ê — typeface poster ---------- */
+.pd-type {
+  background: #050505;
+  color: #fff;
+}
+.pd-type::after {
+  background-image: var(--pd-grain-light);
+  mix-blend-mode: overlay;
+  opacity: 0.5;
+}
+.pd-type__name {
+  position: absolute;
+  top: 4.6cqw;
+  left: 0;
+  right: 0;
+  z-index: 3;
+  text-align: center;
+  font-size: 9.4cqw;
+  font-style: italic;
+  line-height: 1.15;
+}
+/* the round window of Khuê Văn Các, filled with a blurred sunset of the palette */
+.pd-type__window {
+  position: absolute;
+  top: 22cqw;
+  left: 50%;
+  width: 86cqw;
+  aspect-ratio: 1;
+  translate: -50% 0;
+  border-radius: 50%;
+  overflow: hidden;
+  background: linear-gradient(
+    180deg,
+    #050505 0%,
+    #1a1f5c 8%,
+    #5b74eb 16%,
+    #ff9cef 25%,
+    #fbe6d2 31%,
+    #ff9cef 37%,
+    #1b1530 46%,
+    #07070c 50%,
+    #3a4bc4 58%,
+    #ff9cef 67%,
+    #f6e2cc 73%,
+    #c779d6 79%,
+    #2a2f86 87%,
+    #050505 96%
+  );
+}
+.pd-type__window::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: var(--pd-grain-light);
+  background-size: 140px 140px;
+  mix-blend-mode: overlay;
+  opacity: 0.8;
+}
+.pd-type__rays {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  fill: none;
+  stroke: rgb(255 255 255 / 0.28);
+  stroke-width: 0.16;
+}
+.pd-type__ring {
+  position: absolute;
+  top: 19.5cqw;
+  left: 50%;
+  width: 91cqw;
+  aspect-ratio: 1;
+  translate: -50% 0;
+  border: 1px solid rgb(255 255 255 / 0.32);
+  border-radius: 50%;
+}
+.pd-type__glyph {
+  position: absolute;
+  top: 18cqw;
+  left: 0;
+  right: 0;
+  z-index: 2;
+  text-align: center;
+  font-size: 98cqw;
+  font-weight: 400;
+  line-height: 1;
+  color: #fff;
+}
+.pd-type__foot {
+  position: absolute;
+  left: 5cqw;
+  right: 5cqw;
+  bottom: 4.4cqw;
+  z-index: 3;
+}
+.pd-type__claim {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  font-size: 3.9cqw;
+  line-height: 1.2;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-variant-numeric: lining-nums;
+}
+.pd-type__claim i {
+  font-style: normal;
+  opacity: 0.7;
+}
+.pd-type__styles {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 1.8cqw !important;
+  padding-top: 1.6cqw;
+  border-top: 1px solid rgb(255 255 255 / 0.3);
+  font-size: 1.8cqw;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: rgb(255 255 255 / 0.72);
+}
+.pd-type__styles span:nth-child(2) {
+  font-style: italic;
+}
+.pd-type__styles span:nth-child(3) {
+  font-weight: 700;
+}
+.pd-type__styles span:nth-child(4) {
+  font-style: italic;
+  font-weight: 700;
+}

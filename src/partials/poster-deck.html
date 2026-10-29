@@ -1,0 +1,180 @@
+<!-- ==========================================================================
+     Poster deck (pink) — "KHUÊ VĂN" split at Ê: the stack of four posters stands
+     in for the missing letter. ≥768: 1100svh sticky deck (scattered collage →
+     vertical deck that rotates one poster every 160svh). <768: swipe carousel.
+     Motion: src/sections/poster-deck.js · styles: src/styles/30-poster-deck.css
+     ========================================================================== -->
+<section class="deck" data-deck aria-label="Bộ sưu tập áp phích">
+  <div class="deck__stage" data-deck-stage>
+    <!-- giant white words, split outward from the centre seam (desktop only) -->
+    <div class="deck__words" data-deck-words role="img" aria-label="Khuê Văn">
+      <div class="deck__half deck__half--left" aria-hidden="true"><span class="deck__word deck__word--left">KHU</span></div>
+      <div class="deck__half deck__half--right" aria-hidden="true"><span class="deck__word deck__word--right">VĂN</span></div>
+    </div>
+
+    <!-- desktop: display:contents (cards are grid items of the stage) · mobile: carousel viewport + track -->
+    <div class="deck__viewport" data-deck-viewport>
+      <div class="deck__track" data-deck-track>
+
+        <!-- 1 · city magazine cover -->
+        <div class="deck__card" data-deck-card style="--order: 0; --sequence-base-x: 0%; --intro-base: 0vh; --intro-root: 10vh; --intro-slice: 3vh; --intro-scale: 1.5">
+          <div class="deck__lift">
+            <div class="pd-poster pd-hanoi" role="img" aria-label="Áp phích 1: bìa tạp chí “Hà Nội”, số 01, thu 2026, chuyên đề “Nghìn năm văn hiến”, ảnh Khuê Văn Các in hai màu chàm và hồng.">
+              <div class="pd-hanoi__photo">
+                <img src="images/khue-van-cac-wide.webp" alt="" width="1800" height="1200" decoding="async" draggable="false" />
+              </div>
+              <div class="pd-hanoi__shade"></div>
+              <div class="pd-hanoi__top">
+                <span>Số 01 · Thu 2026</span>
+                <span>Tạp chí thành phố</span>
+              </div>
+              <p class="pd-hanoi__mast">Hà Nội</p>
+              <div class="pd-hanoi__rubric">
+                <span>Văn hoá</span><i></i><span>Kiến trúc</span><i></i><span>Chữ viết</span>
+              </div>
+              <ul class="pd-hanoi__lines">
+                <li><em>950 năm</em>Quốc Tử Giám</li>
+                <li><em>82 tấm bia</em>trên lưng rùa đá</li>
+                <li><em>Gác sao Khuê</em>dựng năm 1805</li>
+              </ul>
+              <div class="pd-hanoi__feature">
+                <p class="pd-hanoi__kicker">Chuyên đề · Văn Miếu – Quốc Tử Giám</p>
+                <p class="pd-hanoi__headline">Nghìn năm<br />văn hiến</p>
+              </div>
+              <div class="pd-hanoi__foot">
+                <span>Khuê Văn Các — biểu tượng của Thủ đô</span>
+                <span class="pd-hanoi__barcode"><i></i><b>01</b></span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2 · book cover -->
+        <div class="deck__card" data-deck-card style="--order: 1; --sequence-base-x: -70%; --intro-base: 0vh; --intro-root: 50vh; --intro-slice: 6vh; --intro-scale: 1">
+          <div class="deck__lift">
+            <div class="pd-poster pd-kieu" role="img" aria-label="Áp phích 2: bìa sách “Truyện Kiều” của Nguyễn Du, nền đỏ son, ảnh trang bìa bản khắc gỗ chữ Nôm, kèm hai câu thơ mở đầu: “Trăm năm trong cõi người ta, chữ tài chữ mệnh khéo là ghét nhau.”">
+              <div class="pd-kieu__head">
+                <span class="pd-kieu__author">Nguyễn Du</span>
+                <span class="pd-kieu__dates">1766 — 1820</span>
+              </div>
+              <p class="pd-kieu__title"><span class="pd-kieu__title-small">Truyện</span><span class="pd-kieu__title-big">Kiều</span></p>
+              <div class="pd-kieu__plate">
+                <div class="pd-kieu__print">
+                  <img src="images/kim-van-kieu-tan-truyen.webp" alt="" width="1000" height="764" decoding="async" draggable="false" />
+                </div>
+                <span class="pd-kieu__seal han" aria-hidden="true"><span>新</span><span>斷</span><span>聲</span><span>腸</span></span>
+              </div>
+              <p class="pd-kieu__verse">Trăm năm trong cõi người ta,<br />Chữ tài chữ mệnh khéo là ghét nhau.</p>
+              <div class="pd-kieu__foot">
+                <span><em>Đoạn trường tân thanh</em></span>
+                <span class="pd-kieu__mark" aria-hidden="true"></span>
+                <span>3.254 câu lục bát</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3 · lotus-tea poster -->
+        <div class="deck__card" data-deck-card style="--order: 2; --sequence-base-x: 50%; --intro-base: 40vh; --intro-root: 40vh; --intro-slice: 8vh; --intro-scale: 0.8">
+          <div class="deck__lift">
+            <div class="pd-poster pd-sen" role="img" aria-label="Áp phích 3: trà ướp hương sen “Hương Sen — N°.07”, khung hoa văn mảnh trên nền hồng phấn, hình hoa sen vẽ nét, dòng chữ “Một mùi hương, trước khi thành ký ức.”">
+              <svg class="pd-sen__frame" viewBox="0 0 400 500" aria-hidden="true" focusable="false">
+                <!-- outer hairline with concave (notched) corners, centred on the corner points -->
+                <path class="pd-sen__line" d="M28 14H372A14 14 0 0 0 386 28V472A14 14 0 0 0 372 486H28A14 14 0 0 0 14 472V28A14 14 0 0 0 28 14Z" />
+                <!-- inner fine rule, interrupted top and bottom by lozenges -->
+                <path class="pd-sen__line pd-sen__line--fine" d="M26 26H190M210 26H374V474H210M190 474H26V26" />
+                <path class="pd-sen__orn" d="M200 19l7 7-7 7-7-7zM200 467l7 7-7 7-7-7zM26 22l4 4-4 4-4-4zM374 22l4 4-4 4-4-4zM26 470l4 4-4 4-4-4zM374 470l4 4-4 4-4-4z" />
+              </svg>
+              <p class="pd-sen__eyebrow">Trà ướp hương sen</p>
+              <p class="pd-sen__title">Hương Sen</p>
+              <p class="pd-sen__no"><span>—</span> N°.07 <span>—</span></p>
+              <svg class="pd-sen__lotus" viewBox="0 0 200 180" aria-hidden="true" focusable="false">
+                <defs>
+                  <linearGradient id="pd-petal" x1="0" y1="1" x2="0" y2="0">
+                    <stop offset="0" stop-color="#fff8f6" />
+                    <stop offset="0.5" stop-color="#fbd6df" />
+                    <stop offset="1" stop-color="#ec8fae" />
+                  </linearGradient>
+                  <linearGradient id="pd-petal-back" x1="0" y1="1" x2="0" y2="0">
+                    <stop offset="0" stop-color="#f6dbe2" />
+                    <stop offset="1" stop-color="#df7f9f" />
+                  </linearGradient>
+                  <radialGradient id="pd-leaf" cx="0.5" cy="0.5" r="0.6">
+                    <stop offset="0" stop-color="#e3e9d9" />
+                    <stop offset="1" stop-color="#b4c4aa" />
+                  </radialGradient>
+                  <!-- one broad, pointed petal: base at (100,118), tip at (100,26) -->
+                  <path id="pd-petal-shape" d="M100 118C76 108 70 66 100 26C130 66 124 108 100 118Z" />
+                  <path id="pd-petal-vein" d="M100 114Q99 76 100 34M100 112Q90 88 88 60M100 112Q110 88 112 60" />
+                </defs>
+                <!-- lotus leaf, low left -->
+                <g class="pd-sen__leaf">
+                  <path d="M58 180C58 172 56 166 54 160" class="pd-sen__stem" />
+                  <ellipse cx="54" cy="158" rx="40" ry="12" fill="url(#pd-leaf)" />
+                  <path d="M54 158L90 158M54 158L85 163.4M54 158L72 167.4M54 158L54 168.8M54 158L36 167.4M54 158L23 163.4M54 158L18 158M54 158L23 152.6M54 158L36 148.6M54 158L54 147.2M54 158L72 148.6M54 158L85 152.6" class="pd-sen__rib" />
+                </g>
+                <!-- closed bud, low right -->
+                <g class="pd-sen__bud">
+                  <path d="M164 180C165 172 166 166 166 160" class="pd-sen__stem" />
+                  <path d="M166 161C154 151 156 134 172 121C181 136 178 152 166 161Z" fill="url(#pd-petal)" class="pd-sen__petal" />
+                  <path d="M166 158C163 148 165 136 171 126" class="pd-sen__rib" />
+                  <path d="M166 161C160 159 157 155 156 150M166 161C172 160 176 156 178 151" class="pd-sen__stem pd-sen__stem--fine" />
+                </g>
+                <!-- main stem -->
+                <path d="M100 121C101 140 97 160 99 180" class="pd-sen__stem" />
+                <!-- petals, back to front (each rotated about the base point) -->
+                <g class="pd-sen__petals">
+                  <use href="#pd-petal-shape" transform="translate(100 118) rotate(-70) scale(.86) translate(-100 -118)" fill="url(#pd-petal-back)" />
+                  <use href="#pd-petal-shape" transform="translate(100 118) rotate(70) scale(.86) translate(-100 -118)" fill="url(#pd-petal-back)" />
+                  <use href="#pd-petal-shape" transform="translate(100 118) rotate(-45) scale(.95) translate(-100 -118)" fill="url(#pd-petal-back)" />
+                  <use href="#pd-petal-shape" transform="translate(100 118) rotate(45) scale(.95) translate(-100 -118)" fill="url(#pd-petal-back)" />
+                  <use href="#pd-petal-shape" transform="translate(100 118) rotate(-21) translate(-100 -118)" fill="url(#pd-petal)" />
+                  <use href="#pd-petal-shape" transform="translate(100 118) rotate(21) translate(-100 -118)" fill="url(#pd-petal)" />
+                  <use href="#pd-petal-vein" transform="translate(100 118) rotate(-21) translate(-100 -118)" class="pd-sen__rib" />
+                  <use href="#pd-petal-vein" transform="translate(100 118) rotate(21) translate(-100 -118)" class="pd-sen__rib" />
+                  <use href="#pd-petal-shape" transform="translate(100 118) scale(1.04) translate(-100 -118)" fill="url(#pd-petal)" />
+                  <use href="#pd-petal-vein" transform="translate(100 118) scale(1.04) translate(-100 -118)" class="pd-sen__rib" />
+                </g>
+                <ellipse cx="100" cy="119" rx="10" ry="3.4" class="pd-sen__calyx" />
+              </svg>
+              <p class="pd-sen__line-copy">Một mùi hương, trước khi thành ký ức.</p>
+              <p class="pd-sen__small">Hái lúc tinh sương<i></i>Ướp qua một đêm<i></i>100 g</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 4 · typeface poster -->
+        <div class="deck__card" data-deck-card style="--order: 3; --sequence-base-x: 80%; --intro-base: 10vh; --intro-root: 60vh; --intro-slice: 5vh; --intro-scale: 0.9">
+          <div class="deck__lift">
+            <div class="pd-poster pd-type" role="img" aria-label="Áp phích 4: kiểu chữ “Khuê Văn” — chữ Ê trắng khổng lồ trên vòng tròn chuyển màu hồng, chàm, kem và đen; dòng chân trang “Serif · tiếng Việt · 134 ký tự có dấu”.">
+              <p class="pd-type__name">Khuê Văn</p>
+              <div class="pd-type__window">
+                <svg class="pd-type__rays" viewBox="0 0 100 100" aria-hidden="true" focusable="false">
+                  <path d="M50 50L50 0M50 50L69.1 3.8M50 50L85.4 14.6M50 50L96.2 30.9M50 50L100 50M50 50L96.2 69.1M50 50L85.4 85.4M50 50L69.1 96.2M50 50L50 100M50 50L30.9 96.2M50 50L14.6 85.4M50 50L3.8 69.1M50 50L0 50M50 50L3.8 30.9M50 50L14.6 14.6M50 50L30.9 3.8" />
+                </svg>
+              </div>
+              <span class="pd-type__ring" aria-hidden="true"></span>
+              <p class="pd-type__glyph" aria-hidden="true">Ê</p>
+              <div class="pd-type__foot">
+                <p class="pd-type__claim"><span>Serif</span><i>·</i><span>Tiếng Việt</span><i>·</i><span>134 ký tự có dấu</span></p>
+                <p class="pd-type__styles"><span>Thường</span><span>Nghiêng</span><span>Đậm</span><span>Đậm nghiêng</span></p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- mobile carousel dots (window of scaled dots, active one centred) -->
+    <div class="deck__dots" data-deck-dots aria-hidden="true">
+      <span class="deck__dot"></span><span class="deck__dot"></span><span class="deck__dot"></span><span class="deck__dot"></span>
+    </div>
+    <p class="sr-only" data-deck-status aria-live="polite"></p>
+  </div>
+
+  <!-- scroll length for the desktop deck: intro (100svh) · sequence (100svh) · carousel (800svh) -->
+  <div class="deck__trigger deck__trigger--intro" data-deck-intro aria-hidden="true"></div>
+  <div class="deck__trigger deck__trigger--sequence" data-deck-sequence aria-hidden="true"></div>
+  <div class="deck__trigger deck__trigger--carousel" data-deck-carousel aria-hidden="true"></div>
+</section>
